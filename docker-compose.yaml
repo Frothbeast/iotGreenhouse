@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: greenhouse_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306" # Connect locally via 3307 to avoid native MySQL conflicts
+    volumes:
+      - greenhouse_mysql_data:/var/lib/mysql
+
+  api:
+    build: .
+    container_name: greenhouse_api
+    ports:
+      - "${API_PORT}:5000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - ./client/build:/app/client/build # Maps your React build into the container
+
+volumes:
+  greenhouse_mysql_data: # This persists your data even if the container is deleted

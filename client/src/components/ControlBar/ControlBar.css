@@ -1,0 +1,151 @@
+.controlBar {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--controlBar-height); 
+  background: rgba(44, 62, 80, 0.541);
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+}
+
+.brandSection {
+  flex-basis: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8cqw;
+  width: 100%;
+}
+
+.serverTime {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 3cqw;
+  color: #ffffff;
+  width: 100%;
+  align-self: flex-end;
+}
+
+.stLabel {
+  font-size: 2cqw;
+  color: #888888;
+  align-self: center;
+  margin-right: 1cqw;
+}
+
+.centerSection{
+  flex-basis: 40%;
+  display: flex;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.lastRun, .lastRunPeriod, .hoursSincePowerup{
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3cqw;
+  width: 100%;
+}
+
+.buttonRow {
+  container-type: inline-size;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.sidebarButton,.cl1pButton, .selectedHours {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: 4cqw;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.chartSection {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  flex-basis: 30%;
+  align-items: stretch;
+  height: 100%;
+  border: 1px solid black;
+}
+.chartContainer {
+  flex-basis: 50%;
+  position: relative;
+  box-sizing: border-box;
+  height: 50%;
+  border: 1px solid black;
+}
+.chartContainer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chartWatermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 3cqw; 
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.1);
+  z-index: 0; 
+  pointer-events: none; 
+  user-select: none; 
+}
+.label, .unit {
+  flex: 1; 
+  white-space: nowrap;
+  font-size: 2cqw;
+}
+.label {
+  color: #888888;
+  font-weight: bold;
+  text-align: right;
+  flex: 1;
+}
+
+.unit {
+  color: #888888;
+  font-style: italic;
+  text-align: left;
+  font-size: 2cqw;
+}
+.value {
+  flex: 0 0 auto;
+  color: var(--menu-colour);
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 2cqw;
+}
+
