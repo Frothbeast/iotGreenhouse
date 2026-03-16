@@ -1,13 +1,62 @@
-/* IOTServer/client/src/App.css */
-.App {
-  display: flex;
-  flex-direction: row; /* Side-by-side */
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+
+:root {
+  /* Colors */
+  --main-background: oklch(97.366% 0.02504 196.994);
+  --main-colour: oklch(36.19% 0.01907 223.292);
+
+  --menu-colour: var(--main-colour);
+  --menu-background: var(--main-background);
+
+  /* Typography */
+  --font-main: 'Inter', sans-serif;
+  --font-size-base: 16px;
+
+  /* Spacing */
+  --spacing-sm: 2px;
+  --spacing-md: 4px;
+  --spacing-lg: 8px;
+
+  /* BEM-specific Helpers */
+  --border-radius: 1px;
+  /* Control Bar needs */
+  --controlBar-height: 15vw;
+  /* sumpTable needs */
+  --greenhouseTable__header-height: 12vw;
+  --greenhouseTable__headerRow-height: 2vw;
+  --greenhouseTable__header-font: 1.5vw;
+  --greenhouseTable__header-smallFont: 1vw;
+  --greenhouseTable__data-font: 1.8vw;
+  --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
+  --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
 }
 
-.App > iframe {
-  flex: 1;
-  border: 1px solid #333;
+@media (prefers-color-scheme: dark) {
+ :root{
+    --menu-colour: var(--main-background);
+    --menu-background: var(--main-colour);
+    --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), black 30%);
+    --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), black 30%);
+  }
+}
+
+
+.App {
+  text-align: center;
+  background-color: var(--menu-background);
+  min-height: 100vh;
+  color: var(--menu-colour);
+  padding: 0px;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }

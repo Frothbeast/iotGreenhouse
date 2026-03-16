@@ -42,14 +42,9 @@ function App() {
         serverTime={serverTime}
       />
       <main>
-        {/* Greenhouse specific sidebar (mimics Sump) */}
-        <GreenhouseSidebar 
-          isOpen={isSidebarOpen} 
-          records={records} 
-          selectedHours={selectedHours} 
-        />
         <div className="tableWrapper">
-          {/* Greenhouse data table would go here */}
+          <SumpTable sumpRecords={sumpRecords} columnStats={columnStats} />
+          <Sidebar isOpen={isSidebarOpen} sumpRecords={sumpRecords} selectedHours={selectedHours} />
         </div>
       </main>
     </div>
