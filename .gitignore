@@ -1,0 +1,13 @@
+# Ignore all .env files in any subdirectory
+.env
+**/.env
+# Ignore all virtual environments
+venv/
+.venv/
+ENV/
+
+#Ignore PIC config info
+/PIC/config.h
+client/build/
+client/node_modules/
+client/package-lock.json
