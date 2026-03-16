@@ -19,7 +19,7 @@ services:
     depends_on:
       - db
     env_file:
-      - .env
+      - ../iotGreenhouse/.env
     volumes:
       - ./client/build:/app/client/build # Maps your React build into the container
 
