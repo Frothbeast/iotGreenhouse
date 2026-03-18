@@ -1,26 +1,19 @@
 # greenhouseCollector.py
 import os
-import socket
-import json
-import binascii
 import mysql.connector
-from urllib.parse import parse_qs
 from dotenv import load_dotenv
-from datetime import datetime
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+# Load the greenhouse-specific env
+load_dotenv()
 
-BIND_HOST = os.getenv('BIND_HOST', '0.0.0.0')
-PORT = 1884
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'shared_db_container'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASS'),
-    'database': 'iotData',
+    'host': os.getenv('DB_HOST', 'database'),
+    'user': os.getenv('GREEN_DB_USER'), # Fixed from DB_USER
+    'password': os.getenv('GREEN_DB_PASS'), # Fixed from DB_PASS
+    'database': os.getenv('DB_NAME', 'green_db'), # Fixed from 'iotData'
 }
 
 device_states = {}
-
 
 def flush_device(device_id):
     global device_states
@@ -30,29 +23,26 @@ def flush_device(device_id):
         return
 
     try:
-        count = len(state["temps"])
-        temp_high = max(state["temps"])
-        temp_low = min(state["temps"])
-        temp_avg = round(sum(state["temps"]) / count, 2)
-        rssi_high = max(state["rssis"])
-        rssi_low = min(state["rssis"])
+        # Calculate the "Conservative" data
+        temp_avg = round(sum(state["temps"]) / len(state["temps"]), 2)
         rssi_current = state["rssis"][-1]
 
         conn_db = mysql.connector.connect(**DB_CONFIG)
         cursor = conn_db.cursor()
 
+        # Updated query to match your simple 2-column + timestamp schema
         query = """
             INSERT INTO greenhouseData 
-            (temp_current, temp_high, temp_low, rssi_current, rssi_high, rssi_low, reading_count) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (temperature, rssi) 
+            VALUES (%s, %s)
         """
-        cursor.execute(query, (temp_avg, temp_high, temp_low, rssi_current, rssi_high, rssi_low, count))
+        cursor.execute(query, (temp_avg, rssi_current))
 
         conn_db.commit()
         cursor.close()
         conn_db.close()
 
-        # Reset state
+        # Reset state for next cycle
         device_states[device_id]["temps"] = []
         device_states[device_id]["rssis"] = []
     except Exception as e:

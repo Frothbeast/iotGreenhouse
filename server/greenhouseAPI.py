@@ -1,67 +1,63 @@
 from flask import Flask, request, jsonify, send_from_directory
 import mysql.connector
 import json
-import os
-import requests
-import urllib3
 from datetime import datetime
-from dotenv import load_dotenv
+import os
 from flask_cors import CORS
 
-# Load environment variables
-load_dotenv()
-
-template_dir = '/app/client/build'
-
-app = Flask(__name__,
-            static_folder=template_dir,
-            static_url_path='/')
-
+app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
 
-db_config = {
-    'host': os.getenv('DB_HOST', 'shared_db_container'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASS'),
-    'database': 'iotData'
-}
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST', 'database'),
+        user=os.getenv('GREEN_DB_USER'),
+        password=os.getenv('GREEN_DB_PASS'),
+        database=os.getenv('DB_NAME', 'green_db')
+    )
 
-LOCATION = os.getenv('LOCATION')
-CL1P_TOKEN = os.getenv('CL1P_TOKEN')
-CL1P_URL = os.getenv('CL1P_URL')
-
-
-def get_db():
-    return mysql.connector.connect(**db_config)
-
-# --- START OF ADDITION: Bootstrap Logic ---
-def bootstrap_db():
-    """Ensures the greenhouseData table exists in iotData database on startup."""
+def bootstrap():
     try:
-        conn = get_db()
+        conn = get_db_connection()
         cursor = conn.cursor()
-        # [Correction]: Standalone blueprint for greenhouseData
-        create_table_query = """
-        CREATE TABLE IF NOT EXISTS greenhouseData (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            temp_current DECIMAL(5,2),
-            temp_high DECIMAL(5,2),
-            temp_low DECIMAL(5,2),
-            rssi_current INT,
-            rssi_high INT,
-            rssi_low INT,
-            reading_count INT
-        );
-        """
-        cursor.execute(create_table_query)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS greenhouseData (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                temperature DECIMAL(5,2),
+                rssi INT
+            )
+        """)
         conn.commit()
         cursor.close()
         conn.close()
-        print("Database bootstrap: greenhouseData table is ready.")
+        print("Database bootstrapped successfully.")
     except Exception as e:
-        print(f"Database bootstrap failed: {e}")
-# --- END OF ADDITION ---
+        print(f"Bootstrap failed: {e}")
+
+@app.route('/api/greenhouseData')
+def get_data():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT timestamp, temperature, rssi FROM greenhouseData ORDER BY timestamp DESC LIMIT 100")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        # Using jsonify is cleaner for Flask than json.dumps
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
 
 @app.route('/api/cl1p', methods=['POST'])
 def handle_cl1p_sync():
@@ -70,14 +66,12 @@ def handle_cl1p_sync():
 
     try:
         if LOCATION == "home":
-            conn = get_db()
+            conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
-            # [Correction]: Updated table name to greenhouseData
+            # Simplified query to match your current schema
             query = """
-                SELECT temp_current, temp_high, temp_low, 
-                       rssi_current, rssi_high, rssi_low, 
-                       reading_count, timestamp 
+                SELECT temperature, rssi, timestamp 
                 FROM greenhouseData 
                 WHERE timestamp >= NOW() - INTERVAL 7 DAY
             """
@@ -100,24 +94,26 @@ def handle_cl1p_sync():
 
             if response.status_code == 200:
                 pulled_data = json.loads(response.text)
-                conn = get_db()
+                conn = get_db_connection()
                 cursor = conn.cursor()
                 new_count = 0
 
                 for item in pulled_data:
                     ts = item.get('timestamp')
-                    # [Correction]: Updated table name to greenhouseData
+
+                    # Check for duplicates based on timestamp
                     cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE timestamp = %s", (ts,))
                     if cursor.fetchone()[0] == 0:
+                        # Updated INSERT to match your specific columns: temperature and rssi
                         query = """
                             INSERT INTO greenhouseData 
-                            (temp_current, temp_high, temp_low, rssi_current, rssi_high, rssi_low, reading_count, timestamp) 
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                            (temperature, rssi, timestamp) 
+                            VALUES (%s, %s, %s)
                         """
                         cursor.execute(query, (
-                            item.get('temp_current'), item.get('temp_high'), item.get('temp_low'),
-                            item.get('rssi_current'), item.get('rssi_high'), item.get('rssi_low'),
-                            item.get('reading_count'), ts
+                            item.get('temperature'),
+                            item.get('rssi'),
+                            ts
                         ))
                         new_count += 1
 
@@ -131,66 +127,7 @@ def handle_cl1p_sync():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# [Correction]: Updated endpoint name to greenhouseData
-@app.route('/api/greenhouseData', methods=['GET'])
-def get_greenhouse_data():
-    try:
-        hours = request.args.get('hours', default=24, type=int)
-        conn = get_db()
-        cursor = conn.cursor(dictionary=True)
-        # [Correction]: Updated table name to greenhouseData
-        query = """
-            SELECT timestamp, temp_current, temp_high, temp_low,
-                   rssi_current, rssi_high, rssi_low, reading_count 
-            FROM greenhouseData 
-            WHERE timestamp >= NOW() - INTERVAL %s HOUR
-            ORDER BY timestamp ASC
-        """
-        cursor.execute(query, (hours,))
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return jsonify(rows)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/api/data', methods=['POST'])
-def post_data():
-    try:
-        data = request.get_json()
-        conn = get_db()
-        cursor = conn.cursor()
-        # [Correction]: Updated table name to greenhouseData
-        query = """
-            INSERT INTO greenhouseData 
-            (temp_current, temp_high, temp_low, rssi_current, rssi_high, rssi_low, reading_count) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(query, (
-            data.get('temp_current'), data.get('temp_high'), data.get('temp_low'),
-            data.get('rssi_current'), data.get('rssi_high'), data.get('rssi_low'),
-            data.get('reading_count')
-        ))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return jsonify({"status": "success"}), 201
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, 'index.html')
-
-
 if __name__ == '__main__':
-    # [Correction]: Call bootstrap to ensure table exists before serving requests
-    bootstrap_db()
-    port = int(os.getenv('API_PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    bootstrap()
+    # 0.0.0.0 is essential for Docker access
+    app.run(host='0.0.0.0', port=5000)

@@ -1,27 +1,47 @@
 services:
-  db:
+  database:
     image: mysql:8.0
-    container_name: greenhouse_db
+    container_name: greenhouse_db_container
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
-      MYSQL_DATABASE: ${DB_NAME}
-    ports:
-      - "3307:3306" # Connect locally via 3307 to avoid native MySQL conflicts
+      - TZ=America/Toronto
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${GREEN_DB_USER}
+      - MYSQL_PASSWORD=${GREEN_DB_PASS}
     volumes:
-      - greenhouse_mysql_data:/var/lib/mysql
+      - greenhouse_db_data:/var/lib/mysql
+    networks:
+      - iot-network
 
-  api:
-    build: .
-    container_name: greenhouse_api
+  greenhouse-service:
+    build: 
+      context: .
+      args:
+        # This passes the URL to React during the 'npm run build' phase
+        - REACT_APP_API_URL=${REACT_APP_GREEN_API_URL}
+    environment:
+      - TZ=America/Toronto
+      - API_PORT=${API_PORT}
+      - BIND_HOST=${BIND_HOST}
+      - DB_HOST=database
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${GREEN_DB_USER}
+      - DB_PASS=${GREEN_DB_PASS}
+    restart: always
     ports:
-      - "${API_PORT}:5000"
+      # Standalone access at http://localhost:5001
+      - "5001:5000"
+    env_file: .env
     depends_on:
-      - db
-    env_file:
-      - ../iotGreenhouse/.env
-    volumes:
-      - ./client/build:/app/client/build # Maps your React build into the container
+      - database
+    networks:
+      - iot-network
+
+networks:
+  # Using a named network makes it easier for IOTServer to join later
+  iot-network:
+    driver: bridge
 
 volumes:
-  greenhouse_mysql_data: # This persists your data even if the container is deleted
+  greenhouse_db_data:
