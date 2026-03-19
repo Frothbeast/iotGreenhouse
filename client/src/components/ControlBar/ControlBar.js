@@ -1,4 +1,4 @@
-import GreenhouseChart from '../GreenhouseTable';
+import GreenhouseChart from '../GreenhouseTable/GreenhouseTable';
 import './ControlBar.css';
 
 const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, records, toggleSidebar, isSidebarOpen, serverTime }) => {
