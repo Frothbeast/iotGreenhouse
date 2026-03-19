@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 
 # 3. Copy requirements and install
 COPY server/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt [cite: 5]
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 4. Copy application code
 COPY server/ .
