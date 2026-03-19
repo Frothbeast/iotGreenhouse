@@ -9,9 +9,11 @@ function App() {
   const [selectedHours, setSelectedHours] = useState(24);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   
-  const { records, isLoading } = useGreenhouseData(selectedHours);
+  // 1. Destructure GreenRecords (matching your hook's return)
+  const { GreenRecords, isLoading } = useGreenhouseData(selectedHours);
 
-  const columnStats = useMemo(() => calculateGreenhouseStats(records), [records]);
+  // 2. Pass GreenRecords to the stats calculator
+  const columnStats = useMemo(() => calculateGreenhouseStats(GreenRecords), [GreenRecords]);
 
   const [serverTime, setServerTime] = useState("00:00 AM");
 
@@ -28,7 +30,7 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading) return <div className="loader">Loading...</div>;
+  if (isLoading) return <div className="loader">Loading Greenhouse Data...</div>;
 
   return (
     <div className="App">
@@ -36,16 +38,19 @@ function App() {
         selectedHours={selectedHours}
         onHoursChange={setSelectedHours}
         columnStats={columnStats}
-        records={records} 
+        // 3. Pass GreenRecords to ControlBar
+        records={GreenRecords} 
         toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
         serverTime={serverTime}
       />
       <main>
-        <div className="tableWrapper">
-          <SumpTable sumpRecords={sumpRecords} columnStats={columnStats} />
-          <Sidebar isOpen={isSidebarOpen} sumpRecords={sumpRecords} selectedHours={selectedHours} />
-        </div>
+        {/* GreenhouseSidebar also needs the correct records variable */}
+        <GreenhouseSidebar 
+          isOpen={isSidebarOpen} 
+          records={GreenRecords} 
+          selectedHours={selectedHours} 
+        />
       </main>
     </div>
   );

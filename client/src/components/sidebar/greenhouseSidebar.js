@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import SumpChart from '../sumpTable/sumpChart'; // Reusing your existing chart component
+import GreenhouseChart from '../GreenhouseTable/GreenhouseChart'; 
 import './sidebar.css';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -50,18 +50,20 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebarContent">
         <div className="chartContainer">
-          <SumpChart
+          <GreenhouseChart
             labels={labels}
             datasets={[
-              { label: "Current Temp", color: "#82ca9d", data: records.map(r => r.temp_current) },
-              { label: "High", color: "#ff4d4d", data: records.map(r => r.temp_high) },
-              { label: "Low", color: "#8884d8", data: records.map(r => r.temp_low) }
+            { 
+              label: "Temperature", 
+              color: "#82ca9d", 
+              data: records.map(r => r.temp_current) 
+            }
             ]}
             options={optTemp}
           />
         </div>
         <div className="chartContainer">
-          <SumpChart
+          <GreenhouseChart
             labels={labels}
             datasets={[
               { label: "RSSI", color: "cyan", data: records.map(r => r.rssi_current) }

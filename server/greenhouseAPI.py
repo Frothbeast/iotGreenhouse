@@ -3,37 +3,50 @@ import mysql.connector
 import json
 from datetime import datetime
 import os
+import requests  # Added missing import
+import urllib3   # Added missing import
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
 
+# --- Configuration from Greenhouse.env ---
+# Added missing global variables for cl1p logic
+CL1P_TOKEN = os.getenv('CL1P_TOKEN')
+CL1P_URL = os.getenv('CL1P_URL')
+LOCATION = os.getenv('LOCATION')
+
 def get_db_connection():
     return mysql.connector.connect(
         host=os.getenv('DB_HOST', 'database'),
-        user=os.getenv('GREEN_DB_USER'),
+        user=os.getenv('GREEN_DB_USER'), 
         password=os.getenv('GREEN_DB_PASS'),
         database=os.getenv('DB_NAME', 'green_db')
     )
 
 def bootstrap():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS greenhouseData (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                temperature DECIMAL(5,2),
-                rssi INT
-            )
-        """)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("Database bootstrapped successfully.")
-    except Exception as e:
-        print(f"Bootstrap failed: {e}")
+    retries = 5
+    while retries > 0:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS greenhouseData (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    temperature DECIMAL(5,2),
+                    rssi INT
+                )
+            """)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("Database bootstrapped successfully.")
+            return
+        except Exception as e:
+            print(f"Database not ready, retrying... ({retries} left)")
+            retries -= 1
+            time.sleep(5)
 
 @app.route('/api/greenhouseData')
 def get_data():
@@ -44,7 +57,6 @@ def get_data():
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        # Using jsonify is cleaner for Flask than json.dumps
         return jsonify(rows)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -69,7 +81,6 @@ def handle_cl1p_sync():
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
-            # Simplified query to match your current schema
             query = """
                 SELECT temperature, rssi, timestamp 
                 FROM greenhouseData 
@@ -101,10 +112,8 @@ def handle_cl1p_sync():
                 for item in pulled_data:
                     ts = item.get('timestamp')
 
-                    # Check for duplicates based on timestamp
                     cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE timestamp = %s", (ts,))
                     if cursor.fetchone()[0] == 0:
-                        # Updated INSERT to match your specific columns: temperature and rssi
                         query = """
                             INSERT INTO greenhouseData 
                             (temperature, rssi, timestamp) 
@@ -129,5 +138,6 @@ def handle_cl1p_sync():
 
 if __name__ == '__main__':
     bootstrap()
-    # 0.0.0.0 is essential for Docker access
-    app.run(host='0.0.0.0', port=5000)
+    # Use the internal API_PORT from your environment, defaulting to 5000
+    port = int(os.getenv('API_PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

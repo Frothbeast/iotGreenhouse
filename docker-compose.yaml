@@ -9,6 +9,8 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_USER=${GREEN_DB_USER}
       - MYSQL_PASSWORD=${GREEN_DB_PASS}
+    ports:
+      - "${DB_HOST_PORT}:${DB_DOCKER_PORT}"
     volumes:
       - greenhouse_db_data:/var/lib/mysql
     networks:
@@ -30,8 +32,8 @@ services:
       - DB_PASS=${GREEN_DB_PASS}
     restart: always
     ports:
-      # Standalone access at http://localhost:5001
-      - "5001:5000"
+      - "${GREEN_API_PORT}:${API_PORT}"   
+      - "${COLLECTOR_PORT}:${COLLECTOR_PORT}"
     env_file: .env
     depends_on:
       - database

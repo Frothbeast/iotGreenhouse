@@ -1,32 +1,26 @@
-const StatsLib = {
-  avg: (arr) => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0,
-  max: (arr) => arr.length ? Math.max(...arr).toFixed(1) : 0,
-  min: (arr) => arr.length ? Math.min(...arr).toFixed(1) : 0,
-};
-
+// greenhouseStats.js - FIXED VERSION
 export const calculateGreenhouseStats = (records) => {
   if (!records?.length) return null;
 
-  const highTemps = records.map(r => parseFloat(r.temp_high)).filter(v => !isNaN(v));
-  const lowTemps = records.map(r => parseFloat(r.temp_low)).filter(v => !isNaN(v));
+  // Use 'temp_current' (mapped from 'temperature' in your hook)
+  const temps = records.map(r => parseFloat(r.temp_current)).filter(v => !isNaN(v));
+  const rssis = records.map(r => parseInt(r.rssi_current)).filter(v => !isNaN(v));
   
   const lastRecord = records[0];
-  
   const dateObj = new Date(lastRecord.timestamp);
-  const lastDate = dateObj.toLocaleDateString();
-  const lastTime = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
 
   return {
     temp: {
-      max: StatsLib.max(highTemps), 
-      min: StatsLib.min(lowTemps) 
+      avg: (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1),
+      max: Math.max(...temps).toFixed(1),
+      min: Math.min(...temps).toFixed(1)
     },
     rssi: {
-      high: lastRecord.rssi_high,
-      low: lastRecord.rssi_low
+      current: lastRecord.rssi_current,
+      avg: (rssis.reduce((a, b) => a + b, 0) / rssis.length).toFixed(0)
     },
-    lastTime,
-    lastDate,
-    count: lastRecord.reading_count
+    lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+    lastDate: dateObj.toLocaleDateString(),
+    count: records.length // Use array length since you don't have a 'reading_count' column
   };
 };
