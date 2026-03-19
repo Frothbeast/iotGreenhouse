@@ -13,6 +13,7 @@ services:
       - "${DB_HOST_PORT}:${DB_DOCKER_PORT}"
     volumes:
       - greenhouse_db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
     networks:
       - iot-network
 
@@ -20,8 +21,7 @@ services:
     build: 
       context: .
       args:
-        # This passes the URL to React during the 'npm run build' phase
-        - REACT_APP_API_URL=${REACT_APP_GREEN_API_URL}
+      - REACT_APP_API_URL=${REACT_APP_GREEN_API_URL}
     environment:
       - TZ=America/Toronto
       - API_PORT=${API_PORT}
@@ -41,7 +41,6 @@ services:
       - iot-network
 
 networks:
-  # Using a named network makes it easier for IOTServer to join later
   iot-network:
     driver: bridge
 
