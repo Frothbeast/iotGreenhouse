@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import GreenhouseChart from '../greenhouseTable/GreenhouseChart'; 
+import GreenhouseChart from '../GreenhouseTable/GreenhouseChart'; 
 import './sidebar.css';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
