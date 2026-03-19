@@ -53,9 +53,11 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
           <SumpChart
             labels={labels}
             datasets={[
-              { label: "Current Temp", color: "#82ca9d", data: records.map(r => r.temp_current) },
-              { label: "High", color: "#ff4d4d", data: records.map(r => r.temp_high) },
-              { label: "Low", color: "#8884d8", data: records.map(r => r.temp_low) }
+            { 
+              label: "Temperature", 
+              color: "#82ca9d", 
+              data: records.map(r => r.temp_current) 
+            }
             ]}
             options={optTemp}
           />

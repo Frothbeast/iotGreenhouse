@@ -1,4 +1,4 @@
-import SumpChart from '../sumpTable/sumpChart'; // Reusing your existing chart component
+import GreenhouseChart from '../GreenhouseTable';
 import './ControlBar.css';
 
 const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, records, toggleSidebar, isSidebarOpen, serverTime }) => {
@@ -16,7 +16,6 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
   return (
     <header className="controlBar">
       <div className="brandSection">
-        {/* [Correction]: Labeled Greenhouse but keeps Sump styling */}
         <div className="brand">Greenhouse</div>
         <div className="serverTime">
           <span className="stLabel">Server Time:</span>
@@ -45,7 +44,7 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
       <div className="chartSection">
         <div className="chartContainer">
           <div className="chartWatermark">TEMP</div>
-          <SumpChart
+          <GreenhouseChart
             labels={records.map((_, i) => i)}
             datasets={[
               {
@@ -59,7 +58,7 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
         </div>
         <div className="chartContainer">
           <div className="chartWatermark">RSSI</div>
-          <SumpChart
+          <GreenhouseChart
             labels={records.map((_, i) => i)}
             datasets={[
               {

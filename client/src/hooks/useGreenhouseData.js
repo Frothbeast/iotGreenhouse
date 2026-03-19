@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
 
-export function uuseGreenhouseData(hours) {
-    const [sumpRecords, setSumpRecords] = useState([]);
+export function useGreenhouseData(hours) {
+    const [GreenRecords, setGreenRecords] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
     useEffect(() => {
         let interval;
 
         const fetchData = () => {
-            fetch(`/api/greenhouseData?hours=${hours}`)
+            fetch(`${API_BASE_URL}/api/greenhouseData?hours=${hours}`)
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data)) {
-                        setSumpRecords(data);
+                        const mappedData = data.map(r => ({
+                            ...r,
+                            temp_current: r.temperature, 
+                            rssi_current: r.rssi        
+                    }));
+                        setGreenRecords(mappedData);
                     }
                     setIsLoading(false);
                 })
@@ -46,5 +51,5 @@ export function uuseGreenhouseData(hours) {
         };
     }, [hours]);
 
-    return { sumpRecords, isLoading };
+    return { GreenRecords, isLoading };
 }
