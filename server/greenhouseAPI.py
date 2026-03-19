@@ -3,15 +3,23 @@ import mysql.connector
 import json
 from datetime import datetime
 import os
+import requests  # Added missing import
+import urllib3   # Added missing import
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder='client/build', static_url_path='/')
 CORS(app)
 
+# --- Configuration from Greenhouse.env ---
+# Added missing global variables for cl1p logic
+CL1P_TOKEN = os.getenv('CL1P_TOKEN')
+CL1P_URL = os.getenv('CL1P_URL')
+LOCATION = os.getenv('LOCATION')
+
 def get_db_connection():
     return mysql.connector.connect(
         host=os.getenv('DB_HOST', 'database'),
-        user=os.getenv('GREEN_DB_USER'),
+        user=os.getenv('GREEN_DB_USER'), 
         password=os.getenv('GREEN_DB_PASS'),
         database=os.getenv('DB_NAME', 'green_db')
     )
@@ -44,7 +52,6 @@ def get_data():
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        # Using jsonify is cleaner for Flask than json.dumps
         return jsonify(rows)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -69,7 +76,6 @@ def handle_cl1p_sync():
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
-            # Simplified query to match your current schema
             query = """
                 SELECT temperature, rssi, timestamp 
                 FROM greenhouseData 
@@ -101,10 +107,8 @@ def handle_cl1p_sync():
                 for item in pulled_data:
                     ts = item.get('timestamp')
 
-                    # Check for duplicates based on timestamp
                     cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE timestamp = %s", (ts,))
                     if cursor.fetchone()[0] == 0:
-                        # Updated INSERT to match your specific columns: temperature and rssi
                         query = """
                             INSERT INTO greenhouseData 
                             (temperature, rssi, timestamp) 
@@ -129,5 +133,6 @@ def handle_cl1p_sync():
 
 if __name__ == '__main__':
     bootstrap()
-    # 0.0.0.0 is essential for Docker access
-    app.run(host='0.0.0.0', port=5000)
+    # Use the internal API_PORT from your environment, defaulting to 5000
+    port = int(os.getenv('API_PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
