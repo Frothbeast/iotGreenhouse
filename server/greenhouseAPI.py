@@ -25,23 +25,28 @@ def get_db_connection():
     )
 
 def bootstrap():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS greenhouseData (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                temperature DECIMAL(5,2),
-                rssi INT
-            )
-        """)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("Database bootstrapped successfully.")
-    except Exception as e:
-        print(f"Bootstrap failed: {e}")
+    retries = 5
+    while retries > 0:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS greenhouseData (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    temperature DECIMAL(5,2),
+                    rssi INT
+                )
+            """)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("Database bootstrapped successfully.")
+            return
+        except Exception as e:
+            print(f"Database not ready, retrying... ({retries} left)")
+            retries -= 1
+            time.sleep(5)
 
 @app.route('/api/greenhouseData')
 def get_data():
