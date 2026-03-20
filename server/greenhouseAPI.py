@@ -8,24 +8,52 @@ import requests  # Added missing import
 import urllib3   # Added missing import
 from flask_cors import CORS
 
-app = Flask(__name__, static_folder='client/build', static_url_path='/')
-CORS(app)
+static_dir = os.environ.get('STATIC_FOLDER', '/app/client/build')
 
-# --- Configuration from Greenhouse.env ---
-# Added missing global variables for cl1p logic
+app = Flask(__name__, static_folder=static_dir, static_url_path='/')
+
+print(f"DEBUG: Static folder is set to: {app.static_folder}")
+print(f"DEBUG: Does path exist? {os.path.exists(app.static_folder)}")
+
+CORS(app)
+load_dotenv()
 CL1P_TOKEN = os.getenv('CL1P_TOKEN')
 CL1P_URL = os.getenv('CL1P_URL')
 LOCATION = os.getenv('LOCATION')
 
-def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv('DB_HOST', 'database'),
-        user=os.getenv('GREEN_DB_USER'), 
-        password=os.getenv('GREEN_DB_PASS'),
-        database=os.getenv('DB_NAME', 'green_db')
-    )
+GREEN_USER = os.getenv('GREEN_DB_USER')
+GREEN_PASS = os.getenv('GREEN_DB_PASS')
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
 
-def bootstrap():
+if not GREEN_USER or not GREEN_PASS:
+    sys.stderr.write(f"ERROR: Environment Variables Missing! User: {GREEN_USER}, Pass: {'SET' if GREEN_PASS else 'MISSING'}\n")
+
+db_config = {
+    'host': DB_HOST,
+    'user': GREEN_USER,
+    'password': GREEN_PASS,
+    'database': DB_NAME
+}
+
+def datetime_handler(x):
+    if isinstance(x, datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
+
+def get_db_connection():
+    retries = 5
+    while retries > 0:
+        try:
+            conn = mysql.connector.connect(**db_config)
+            return conn
+        except mysql.connector.Error as err:
+            sys.stderr.write(f"Connection failed, retrying in 5s... {err}\n")
+            retries -= 1
+            time.sleep(5)
+    return None
+
+def bootstrap_db():
     retries = 5
     while retries > 0:
         try:
@@ -34,9 +62,14 @@ def bootstrap():
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS greenhouseData (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    temperature DECIMAL(5,2),
-                    rssi INT
+                    esp_ID VARCHAR(50),
+                    datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    tempHigh DECIMAL(5,2),
+                    tempLow DECIMAL(5,2),
+                    rssiHigh INT,
+                    rssiLow INT,
+                    readingCount INT,
+                    notes VARCHAR(50)
                 )
             """)
             conn.commit()
@@ -52,15 +85,29 @@ def bootstrap():
 @app.route('/api/greenhouseData')
 def get_data():
     try:
+        hours = request.args.get('hours', default=24, type=int)
+        print(f"DEBUG: Fetching data for last {hours} hours", file=sys.stderr, flush=True)
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT timestamp, temperature, rssi FROM greenhouseData ORDER BY timestamp DESC LIMIT 100")
+        cursor.execute("SELECT datetime, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE datetime > NOW() - INTERVAL %s HOUR")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        return jsonify(rows)
+
+        return app.response_class(
+            response=json.dumps(rows, default=datetime_handler),
+            status=200,
+            mimetype='application/json'
+        )
+
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"ERROR: {str(e)}", file=sys.stderr, flush=True)
+        return jsonify([]), 200
+
+@app.route('/api/time', methods=['GET'])
+def get_time():
+    return jsonify({"time": datetime.now().strftime("%I:%M %p")})
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -78,67 +125,82 @@ def handle_cl1p_sync():
     headers = {"Content-Type": "text/plain", "cl1papitoken": CL1P_TOKEN}
 
     try:
-        if LOCATION == "home":
+        if location == "home":
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
             query = """
-                SELECT temperature, rssi, timestamp 
-                FROM greenhouseData 
-                WHERE timestamp >= NOW() - INTERVAL 7 DAY
+                SELECT datetime,
+                    esp_ID,
+                    tempHigh,
+                    tempLow,
+                    rssiHigh,
+                    rssiLow,
+                    readingCount,
+                    notes
+                FROM greenhouseData
+                WHERE datetime >= NOW() - INTERVAL 7 DAY
             """
             cursor.execute(query)
             rows = cursor.fetchall()
 
             for row in rows:
-                if isinstance(row['timestamp'], datetime):
-                    row['timestamp'] = row['timestamp'].isoformat()
+                if isinstance(row['datetime'], datetime):
+                    row['datetime'] = str(row['datetime'])
+                    row['tempHigh'] = str(row['tempHigh'])
+                    row['tempLow'] = str(row['tempLow'])
+                    row['rssiHigh'] = str(row['rssiHigh'])
+                    row['rssiLow'] = str(row['rssiLow'])
+                    row['readingCount'] = str(row['readingCount'])
+                    row['notes'] = str(row['notes'])
+                    row['esp_ID'] = str(row['esp_ID'])
 
-            payload = json.dumps(rows)
-            requests.post(CL1P_URL, data=payload, headers=headers, verify=False)
+
+            long_string_payload = json.dumps(rows)
+            response = requests.post(cl1pURL, data=long_string_payload, headers=headers, verify=False)
 
             cursor.close()
             conn.close()
             return jsonify({"status": "pushed to cl1p", "count": len(rows)}), 200
 
         elif LOCATION == "work":
-            response = requests.get(CL1P_URL, headers={"cl1papitoken": CL1P_TOKEN}, verify=False)
+            response = requests.get(cl1pURL, headers=headers, verify=False)
 
             if response.status_code == 200:
-                pulled_data = json.loads(response.text)
-                conn = get_db_connection()
-                cursor = conn.cursor()
-                new_count = 0
+                cl1p_payloads = json.loads(response.text)
+                if isinstance(cl1p_payloads, list):
+                    conn = get_db_connection()
+                    if not conn: return jsonify({"error": "DB Connection Timeout"}), 500
+                    cursor = conn.cursor()
 
-                for item in pulled_data:
-                    ts = item.get('timestamp')
-
-                    cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE timestamp = %s", (ts,))
-                    if cursor.fetchone()[0] == 0:
-                        query = """
-                            INSERT INTO greenhouseData 
-                            (temperature, rssi, timestamp) 
-                            VALUES (%s, %s, %s)
-                        """
-                        cursor.execute(query, (
-                            item.get('temperature'),
-                            item.get('rssi'),
-                            ts
-                        ))
-                        new_count += 1
-
-                conn.commit()
-                cursor.close()
-                conn.close()
-                return jsonify({"status": "imported from cl1p", "new_rows": new_count}), 200
-
-            return jsonify({"error": "failed to fetch from cl1p"}), response.status_code
-
+                    for item in cl1p_payloads:
+                        ts = item.get('datetime')
+                        cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE datetime = %s", (ts,))
+                        if cursor.fetchone()[0] == 0:
+                            query = """
+                                    INSERT INTO greenhouseData (datetime,
+                                        esp_ID,
+                                        tempHigh,
+                                        tempLow,
+                                        rssiHigh,
+                                        rssiLow,
+                                        readingCounts,
+                                        notes
+                                    )
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                                """
+                            cursor.execute(query, (ts, item.get('esp_ID'), item.get('tempHigh'),
+                                                   item.get('tempLow'), item.get('rssiHigh'),
+                                                   item.get('rssiLow'), item.get('readingCounts'),
+                                                   item.get('notes')))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+            return '', 204
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    bootstrap()
-    # Use the internal API_PORT from your environment, defaulting to 5000
-    port = int(os.getenv('API_PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    bootstrap_db()
+    port = int(os.getenv('API_PORT'))
+    app.run(host='0.0.0.0', port=port_env)
