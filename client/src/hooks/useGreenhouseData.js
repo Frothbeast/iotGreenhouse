@@ -14,8 +14,10 @@ export function useGreenhouseData(hours) {
                     if (Array.isArray(data)) {
                         const mappedData = data.map(r => ({
                             ...r,
-                            temp_current: r.temperature, 
-                            rssi_current: r.rssi        
+                            highTemp: r.highTemp,
+                            lowTemp: r.lowTemp,
+                            highrssi: r.highrssi,
+                            rssi_current: r.rssi
                     }));
                         setGreenRecords(mappedData);
                     }

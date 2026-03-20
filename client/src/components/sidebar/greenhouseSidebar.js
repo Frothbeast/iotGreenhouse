@@ -53,11 +53,16 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
           <GreenhouseChart
             labels={labels}
             datasets={[
-            { 
-              label: "Temperature", 
-              color: "#82ca9d", 
-              data: records.map(r => r.temp_current) 
-            }
+              {
+                label: "High Temps",
+                color: "red",
+                data: records.map(r => r.tempHigh),
+              },
+              {
+                label: "Low Temps",
+                color: "pink",
+                data: records.map(r => r.tempLow),
+              }
             ]}
             options={optTemp}
           />
@@ -66,7 +71,16 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
           <GreenhouseChart
             labels={labels}
             datasets={[
-              { label: "RSSI", color: "cyan", data: records.map(r => r.rssi_current) }
+              {
+                label: "High RSSI",
+                color: "cyan",
+                data: records.map(r => r.rssiHigh)
+              },
+              {
+                label: "Low RSSI",
+                color: "cyan",
+                data: records.map(r => r.rssiLow)
+              }
             ]}
             options={optRSSI}
           />

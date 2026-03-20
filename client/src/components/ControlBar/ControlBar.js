@@ -29,15 +29,17 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
           <span className="value">{columnStats?.lastTime ?? "N/a"}</span>
           <span className="unit">{columnStats?.lastDate ?? "N/a"}</span>
         </div>
-        <div className="statsRow">
-          <div className="statItem">
-            <span className="label">Current Temp</span>
-            <span className="value">{columnStats?.temp.avg ?? 0}°</span>
-          </div>
-          <div className="statItem">
-            <span className="label">Count</span>
-            <span className="value">{columnStats?.count ?? 0}</span>
-          </div>
+        <div className="buttonRow">
+          <button className="sidebarButton" onClick={toggleSidebar}>
+            {isSidebarOpen ? "Close Chart" : "View Graph"}
+          </button>
+          <button onClick={cl1pClick} className="cl1pButton">CL1P</button>
+          <select className="selectedHours" value={selectedHours} onChange={(e) => onHoursChange(Number(e.target.value))}>
+            <option value={1}>1 Hour</option>
+            <option value={8}>8 Hour</option>
+            <option value={24}>24 Hour</option>
+            <option value={168}>168 Hour</option>
+          </select>
         </div>
       </div>
 
@@ -48,9 +50,14 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
             labels={records.map((_, i) => i)}
             datasets={[
               {
-                label: "Current Temp",
-                color: "#82ca9d",
-                data: records.map(r => r.temp_current),
+                label: "High Temps",
+                color: "red",
+                data: records.map(r => r.tempHigh),
+              },
+              {
+                label: "Low Temps",
+                color: "pink",
+                data: records.map(r => r.tempLow),
               }
             ]}
             options={getOptions(0, 120)}
@@ -62,9 +69,14 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
             labels={records.map((_, i) => i)}
             datasets={[
               {
-                label: "RSSI",
+                label: "High RSSI",
                 color: "cyan",
-                data: records.map(r => r.rssi_current)
+                data: records.map(r => r.rssiHigh)
+              },
+              {
+                label: "Low RSSI",
+                color: "cyan",
+                data: records.map(r => r.rssiLow)
               }
             ]}
             options={getOptions(-100, 0)}

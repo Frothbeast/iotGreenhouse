@@ -1,26 +1,33 @@
-// greenhouseStats.js - FIXED VERSION
-export const calculateGreenhouseStats = (records) => {
+const StatsLib = {
+  avg: (arr) => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0,
+  max: (arr) => arr.length ? Math.max(...arr) : 0,
+  min: (arr) => arr.length ? Math.min(...arr) : 0,
+};
+
+
+export const columnStats = (greenhouseRecords) => {
   if (!records?.length) return null;
 
   // Use 'temp_current' (mapped from 'temperature' in your hook)
-  const temps = records.map(r => parseFloat(r.temp_current)).filter(v => !isNaN(v));
-  const rssis = records.map(r => parseInt(r.rssi_current)).filter(v => !isNaN(v));
-  
+  const esp_IDs = records.map(r => parseFloat(r.esp_ID)).filter(v => !isNaN(v));
+  const tempHighs = records.map(r => parseFloat(r.tempHigh)).filter(v => !isNaN(v));
+  const rssiHighs = records.map(r => parseInt(r.rssiHigh)).filter(v => !isNaN(v));
+  const tempLows = records.map(r => parseFloat(r.tempLow)).filter(v => !isNaN(v));
+  const rssiLows = records.map(r => parseInt(r.rssiLow)).filter(v => !isNaN(v));
+  const readingCounts = records.map(r => parseInt(r.readingCount)).filter(v => !isNaN(v));
+
   const lastRecord = records[0];
   const dateObj = new Date(lastRecord.timestamp);
 
   return {
-    temp: {
-      avg: (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1),
-      max: Math.max(...temps).toFixed(1),
-      min: Math.min(...temps).toFixed(1)
-    },
-    rssi: {
-      current: lastRecord.rssi_current,
-      avg: (rssis.reduce((a, b) => a + b, 0) / rssis.length).toFixed(0)
-    },
+    tempHigh: {avg: StatsLib.avg(tempHigh).toFixed(1),max: StatsLib.max(tempHigh).toFixed(1),min: StatsLib.min(tempHigh).toFixed(1)},
+    tempLow: {avg: StatsLib.avg(tempLow).toFixed(1),max: StatsLib.max(tempLow).toFixed(1),min: StatsLib.min(tempLow).toFixed(1)},
+    rssiHigh: {avg: StatsLib.avg(rssiHigh).toFixed(1),max: StatsLib.max(rssiHigh).toFixed(1),min: StatsLib.min(rssiHigh).toFixed(1)},
+    rssiLow: {avg: StatsLib.avg(rssiLow).toFixed(1),max: StatsLib.max(rssiLow).toFixed(1),min: StatsLib.min(rssiLow).toFixed(1)},
+    readingCount: {avg: StatsLib.avg(readingCount).toFixed(1),max: StatsLib.max(readingCount).toFixed(1),min: StatsLib.min(readingCount).toFixed(1)},
+
     lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     lastDate: dateObj.toLocaleDateString(),
-    count: records.length // Use array length since you don't have a 'reading_count' column
+    lastCount: lastRecord.readingCount
   };
 };
