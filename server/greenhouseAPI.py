@@ -203,5 +203,5 @@ def handle_cl1p_sync():
 
 if __name__ == '__main__':
     bootstrap_db()
-    port = int(os.getenv('API_PORT'))
+    port_env = int(os.getenv('API_PORT'))
     app.run(host='0.0.0.0', port=port_env)
