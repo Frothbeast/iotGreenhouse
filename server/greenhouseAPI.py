@@ -91,10 +91,10 @@ def get_data():
         print(f"DEBUG: Fetching data for last {hours} hours", file=sys.stderr, flush=True)
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-
+        unit = "DISH_UNIT"
         cursor.execute(
-            "SELECT datetime, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;",
-            (hours,))
+            "SELECT datetime, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_id = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;",
+            (unit, hours,))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
