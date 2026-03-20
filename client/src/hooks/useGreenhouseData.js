@@ -53,5 +53,5 @@ export function useGreenhouseData(hours) {
         };
     }, [hours]);
 
-    return { GreenRecords, isLoading };
+    return { greenRecords, isLoading };
 }
