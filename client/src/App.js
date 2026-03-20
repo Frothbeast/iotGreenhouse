@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useGreenhouseData } from './hooks/useGreenhouseData';
 import GreenhouseSidebar from './components/sidebar/greenhouseSidebar';
 import ControlBar from './components/ControlBar/ControlBar';
-import { calculateGreenhouseStats } from './utils/greenhouseStats';
+import { columnStats } from './utils/greenhouseStats';
 import './App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
   const { GreenRecords, isLoading } = useGreenhouseData(selectedHours);
 
   // 2. Pass GreenRecords to the stats calculator
-  const columnStats = useMemo(() => calculateGreenhouseStats(GreenRecords), [GreenRecords]);
+  const columnStats = useMemo(() => columnsStats(GreenRecords), [GreenRecords]);
 
   const [serverTime, setServerTime] = useState("00:00 AM");
 
