@@ -92,7 +92,7 @@ def get_data():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         unit = "DISH_UNIT"
-        query = "SELECT datetime, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
+        query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
         cursor.execute(query, (unit, int(hours)))
         rows = cursor.fetchall()
         print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
