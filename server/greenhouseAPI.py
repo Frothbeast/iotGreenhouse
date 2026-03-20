@@ -8,6 +8,7 @@ import requests  # Added missing import
 import urllib3   # Added missing import
 from flask_cors import CORS
 from dotenv import load_dotenv
+import sys
 
 static_dir = os.environ.get('STATIC_FOLDER', '/app/client/build')
 
