@@ -1,6 +1,6 @@
-USE iotData;
+USE greenhouse_db;
 
--- [Correction]: Using greenhouseData as the table name
+
 CREATE TABLE IF NOT EXISTS greenhouseData (
     id INT AUTO_INCREMENT PRIMARY KEY,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
