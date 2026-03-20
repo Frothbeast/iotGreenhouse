@@ -5,7 +5,7 @@ const StatsLib = {
 };
 
 
-export const columnStats = (greenhouseRecords) => {
+export const calculateColumnStats  = (greenhouseRecords) => {
   if (!records?.length) return null;
 
   // Use 'temp_current' (mapped from 'temperature' in your hook)
