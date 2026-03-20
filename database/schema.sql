@@ -1,5 +1,5 @@
-USE greenhouse_db;
-
+CREATE DATABASE IF NOT EXISTS `greenhouse_db`;
+USE `greenhouse_db`;
 
 CREATE TABLE IF NOT EXISTS greenhouseData (
     id INT AUTO_INCREMENT PRIMARY KEY,
