@@ -13,7 +13,7 @@ function App() {
   const { GreenRecords, isLoading } = useGreenhouseData(selectedHours);
 
   // 2. Pass GreenRecords to the stats calculator
-  const columnStats = useMemo(() => columnsStats(GreenRecords), [GreenRecords]);
+  const columnStats = useMemo(() => columnStats(GreenRecords), [GreenRecords]);
 
   const [serverTime, setServerTime] = useState("00:00 AM");
 
