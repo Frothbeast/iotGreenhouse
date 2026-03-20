@@ -10,10 +10,10 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   
   // 1. Destructure GreenRecords (matching your hook's return)
-  const { GreenRecords, isLoading } = useGreenhouseData(selectedHours);
+  const { greenRecords, isLoading } = useGreenhouseData(selectedHours);
 
   // 2. Pass GreenRecords to the stats calculator
-  const columnStats = useMemo(() => calculateColumnStats (GreenRecords), [GreenRecords]);
+  const columnStats = useMemo(() => calculateColumnStats (greenRecords), [greenRecords]);
 
   const [serverTime, setServerTime] = useState("00:00 AM");
 
@@ -39,7 +39,7 @@ function App() {
         onHoursChange={setSelectedHours}
         columnStats={columnStats}
         // 3. Pass GreenRecords to ControlBar
-        records={GreenRecords} 
+        records={greenRecords}
         toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
         serverTime={serverTime}
@@ -48,7 +48,7 @@ function App() {
         {/* GreenhouseSidebar also needs the correct records variable */}
         <GreenhouseSidebar 
           isOpen={isSidebarOpen} 
-          records={GreenRecords} 
+          records={greenRecords}
           selectedHours={selectedHours} 
         />
       </main>

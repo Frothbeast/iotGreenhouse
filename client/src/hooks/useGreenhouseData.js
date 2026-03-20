@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export function useGreenhouseData(hours) {
-    const [GreenRecords, setGreenRecords] = useState([]);
+    const [greenRecords, setGreenRecords] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const API_BASE_URL = process.env.REACT_APP_API_URL || '';
     useEffect(() => {

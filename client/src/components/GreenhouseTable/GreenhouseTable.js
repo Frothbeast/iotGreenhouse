@@ -1,7 +1,7 @@
 import React from 'react';
 import './GreenhouseTable.css';
 
-const GreenhouseTable = ({ records = [], columnStats }) => {
+const GreenhouseTable = ({ greenrecords = [], columnStats }) => {
     if (!columnStats) return null;
 
     return (
@@ -43,7 +43,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 </thead>
                 <tbody className="greenhouseTableBody">
                     <tr className="greenhouseTablePlaceholder"></tr>
-                    {Array.isArray(records) && records.map((record) => (
+                    {Array.isArray(greenrecords) && greenrecords.map((record) => (
                         <tr key={record.id} className="greenhouseTableRow">
                             <td className="greenhouseTableCell1"></td>
                             <td className="greenhouseTableCell2">

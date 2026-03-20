@@ -5,18 +5,18 @@ const StatsLib = {
 };
 
 
-export const calculateColumnStats  = (greenhouseRecords) => {
-  if (!greenhouseRecords?.length) return null;
+export const calculateColumnStats  = (greenRecords) => {
+  if (!greenRecords?.length) return null;
 
   // Use 'temp_current' (mapped from 'temperature' in your hook)
-  const esp_IDs = greenhouseRecords.map(r => parseFloat(r.esp_ID)).filter(v => !isNaN(v));
-  const tempHighs = greenhouseRecords.map(r => parseFloat(r.tempHigh)).filter(v => !isNaN(v));
-  const rssiHighs = greenhouseRecords.map(r => parseInt(r.rssiHigh)).filter(v => !isNaN(v));
-  const tempLows = greenhouseRecords.map(r => parseFloat(r.tempLow)).filter(v => !isNaN(v));
-  const rssiLows = greenhouseRecords.map(r => parseInt(r.rssiLow)).filter(v => !isNaN(v));
-  const readingCounts = greenhouseRecords.map(r => parseInt(r.readingCount)).filter(v => !isNaN(v));
+  const esp_IDs = greenrecords.map(r => parseFloat(r.esp_ID)).filter(v => !isNaN(v));
+  const tempHighs = greenrecords.map(r => parseFloat(r.tempHigh)).filter(v => !isNaN(v));
+  const rssiHighs = greenrecords.map(r => parseInt(r.rssiHigh)).filter(v => !isNaN(v));
+  const tempLows = greenrecords.map(r => parseFloat(r.tempLow)).filter(v => !isNaN(v));
+  const rssiLows = greenrecords.map(r => parseInt(r.rssiLow)).filter(v => !isNaN(v));
+  const readingCounts = greenrecords.map(r => parseInt(r.readingCount)).filter(v => !isNaN(v));
 
-  const lastRecord = greenhouseRecords[0];
+  const lastRecord = greenrecords[0];
   const dateObj = new Date(lastRecord.timestamp);
 
   return {
