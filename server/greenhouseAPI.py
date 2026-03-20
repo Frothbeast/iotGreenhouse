@@ -95,6 +95,7 @@ def get_data():
         query = "SELECT datetime, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
         cursor.execute(query, (unit, int(hours)))
         rows = cursor.fetchall()
+        print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
         cursor.close()
         conn.close()
 
