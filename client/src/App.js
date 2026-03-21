@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useGreenhouseData } from './hooks/useGreenhouseData';
 import GreenhouseSidebar from './components/sidebar/greenhouseSidebar';
+import GreenhouseTable from './components/GreenhouseTable/GreenhouseTable';
 import ControlBar from './components/ControlBar/ControlBar';
 import { calculateColumnStats  } from './utils/greenhouseStats';
 import './App.css';
