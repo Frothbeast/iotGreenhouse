@@ -34,10 +34,10 @@
   .greenhouseTable {
     /* Updated font sizes to match sumpTable.css scale */
     --GreenhouseTable__header-font: 6cqw;
-    --GreenhouseTable__data-font: 8cqw;
-    --GreenhouseTable__header-smallFont: 6cqw;
-    --GreenhouseTable__header-height: 50cqw;
-    --GreenhouseTable__headerRow-height: 12vw; 
+    --GreenhouseTable__data-font: 6cqw;
+    --GreenhouseTable__header-smallFont: 4cqw;
+    --GreenhouseTable__header-height: 35cqw;
+    --GreenhouseTable__headerRow-height: 16cqw; 
   }
 }
 

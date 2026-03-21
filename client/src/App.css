@@ -21,11 +21,11 @@
   /* Control Bar needs */
   --controlBar-height: 15vw;
   /*greenhouseTable needs */
---greenhouseTable__header-height: 24cqw;    
+  --greenhouseTable__header-height: 15cqw;    
   --greenhouseTable__headerRow-height: 4cqw; 
-  --greenhouseTable__header-font: 3cqw;       
-  --greenhouseTable__header-smallFont: 2cqw;  
-  --greenhouseTable__data-font: 3.6cqw;      
+  --greenhouseTable__header-font: 4cqw;       
+  --greenhouseTable__header-smallFont: 3cqw;  
+  --greenhouseTable__data-font: 5cqw;      
   --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
   --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
 }
