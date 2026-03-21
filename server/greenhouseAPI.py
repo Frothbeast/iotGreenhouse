@@ -41,7 +41,9 @@ db_config = {
 def datetime_handler(x):
     if isinstance(x, datetime):
         return x.isoformat()
-    raise TypeError("Unknown type")
+    if isinstance(x, Decimal):
+        return float(x)
+    raise TypeError(f"Unknown type: {type(x)}")
 
 def get_db_connection():
     retries = 5
