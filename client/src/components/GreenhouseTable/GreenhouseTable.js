@@ -9,7 +9,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
             <table className="greenhouseTable">
                 <thead className="greenhouseTableHeader">
                     <tr className="greenhouseTableHeaderRow1">
-                        <th className="greenhouseTableHeaderCell1Row1"></th>
+                        <th className="greenhouseTableHeaderCell1Row2"></th>
                         <th className="greenhouseTableHeaderCellRow1">tempHigh</th>
                         <th className="greenhouseTableHeaderCellRow1">tempLow</th>
                         <th className="greenhouseTableHeaderCellRow1">rssiHigh</th>
@@ -43,9 +43,9 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 </thead>
                 <tbody className="greenhouseTableBody">
                     <tr className="greenhouseTablePlaceholder"></tr>
+                    <tr className="greenhouseTablePlaceholder"></tr>
                     {Array.isArray(records) && records.map((record) => (
                         <tr key={record.id} className="greenhouseTableRow">
-                            <td className="greenhouseTableCell1"></td>
                             <td className="greenhouseTableCell2">
                                 {record.datetime ? record.datetime.split(/[ T]/)[1].substring(0, 5) : "N/a"}
                             </td>
