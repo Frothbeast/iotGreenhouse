@@ -8,8 +8,6 @@ const StatsLib = {
 export const calculateColumnStats  = (greenRecords) => {
   if (!greenRecords?.length) return null;
 
-  // Use 'temp_current' (mapped from 'temperature' in your hook)
-  const esp_IDs = greenRecords.map(r => parseFloat(r.esp_ID)).filter(v => !isNaN(v));
   const tempHighs = greenRecords.map(r => parseFloat(r.tempHigh)).filter(v => !isNaN(v));
   const rssiHighs = greenRecords.map(r => parseInt(r.rssiHigh)).filter(v => !isNaN(v));
   const tempLows = greenRecords.map(r => parseFloat(r.tempLow)).filter(v => !isNaN(v));
