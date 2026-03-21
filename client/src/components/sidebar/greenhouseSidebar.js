@@ -44,7 +44,7 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
   const optRSSI = useMemo(() => createConfig(timeUnit), [timeUnit]);
 
   // [Correction]: Mapping to greenhouseData flat columns
-  const labels = records.map(r => new Date(r.timestamp));
+  const labels = records.map(r => new Date(r.datetime));
 
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>

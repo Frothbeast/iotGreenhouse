@@ -17,7 +17,7 @@ export const calculateColumnStats  = (greenRecords) => {
   const readingCounts = greenRecords.map(r => parseInt(r.readingCount)).filter(v => !isNaN(v));
 
   const lastRecord = greenRecords[0];
-  const dateObj = new Date(lastRecord.timestamp);
+  const dateObj = new Date(lastRecord.datetime);
 
   return {
     tempHigh: {avg: StatsLib.avg(tempHighs).toFixed(1),max: StatsLib.max(tempHighs).toFixed(1),min: StatsLib.min(tempHighs).toFixed(1)},

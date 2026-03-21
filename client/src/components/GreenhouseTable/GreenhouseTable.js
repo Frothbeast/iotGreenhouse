@@ -47,7 +47,7 @@ const GreenhouseTable = ({ greenrecords = [], columnStats }) => {
                         <tr key={record.id} className="greenhouseTableRow">
                             <td className="greenhouseTableCell1"></td>
                             <td className="greenhouseTableCell2">
-                                {record.timestamp ? record.timestamp.split(/[ T]/)[1].substring(0, 5) : "N/a"}
+                                {record.datetime ? record.datetime.split(/[ T]/)[1].substring(0, 5) : "N/a"}
                             </td>
                             <td className="greenhouseTableCell">{record.tempHigh ?? "N/a"}°C</td>
                             <td className="greenhouseTableCell">{record.tempLow ?? "N/a"}°C</td>
