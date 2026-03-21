@@ -33,11 +33,11 @@
 @container GreenhouseContainer (max-width:844px) {
   .greenhouseTable {
     /* Updated font sizes to match sumpTable.css scale */
-    --GreenhouseTable__header-font: 12cqw;
-    --GreenhouseTable__data-font: 15cqw;
-    --GreenhouseTable__header-smallFont: 3cqw;
+    --GreenhouseTable__header-font: 6cqw;
+    --GreenhouseTable__data-font: 8cqw;
+    --GreenhouseTable__header-smallFont: 6cqw;
     --GreenhouseTable__header-height: 50cqw;
-    --GreenhouseTable__headerRow-height: 6vw; 
+    --GreenhouseTable__headerRow-height: 12vw; 
   }
 }
 
