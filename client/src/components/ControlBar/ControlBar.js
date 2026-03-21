@@ -10,7 +10,13 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
       x: { display: false, reverse: true },
       y: { display: false, min, max }
     },
-    elements: { point: { radius: 0 } }
+    elements: { 
+      point: { 
+        radius: 0, 
+        hitRadius: 0, 
+        hoverRadius: 0 
+      } 
+    }
   });
 
   return (

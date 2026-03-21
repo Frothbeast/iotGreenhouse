@@ -13,6 +13,13 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
   const createConfig = (unit) => ({
     responsive: true,
     maintainAspectRatio: false,
+    elements: {
+      point: {
+        radius: 0, 
+        hoverRadius: 6, 
+        hitRadius: 7, 
+      }
+    },
     plugins: {
       legend: {
         display: true,
@@ -43,7 +50,6 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
   const optTemp = useMemo(() => createConfig(timeUnit), [timeUnit]);
   const optRSSI = useMemo(() => createConfig(timeUnit), [timeUnit]);
 
-  // [Correction]: Mapping to greenhouseData flat columns
   const labels = records.map(r => new Date(r.datetime));
 
   return (
