@@ -43,7 +43,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 </thead>
                 <tbody className="greenhouseTableBody">
                     <tr className="greenhouseTablePlaceholder"></tr>
-                    {Array.isArray(records) && greenrecords.map((record) => (
+                    {Array.isArray(records) && records.map((record) => (
                         <tr key={record.id} className="greenhouseTableRow">
                             <td className="greenhouseTableCell1"></td>
                             <td className="greenhouseTableCell2">
