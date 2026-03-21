@@ -34,7 +34,7 @@
   .greenhouseTable {
     /* Updated font sizes to match sumpTable.css scale */
     --GreenhouseTable__header-font: 6cqw;
-    --GreenhouseTable__data-font: 6cqw;
+    --GreenhouseTable__data-font: 4cqw;
     --GreenhouseTable__header-smallFont: 4cqw;
     --GreenhouseTable__header-height: 35cqw;
     --GreenhouseTable__headerRow-height: 16cqw; 
@@ -79,7 +79,7 @@
 .greenhouseTableHeaderCell1Row1 {
   height: var(--GreenhouseTable__headerRow-height);
   top: var(--controlBar-height);
-  font-size: var(--GreenhouseTable__header-font);
+  font-size: var(--GreenhouseTable__header-smallFont);
 } 
 
 .greenhouseTableHeaderCell1Row1 {
