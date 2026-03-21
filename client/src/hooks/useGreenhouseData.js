@@ -15,7 +15,7 @@ export function useGreenhouseData(hours) {
                         const mappedData = data.map(r => ({
                             ...r,
                             datetime: r.datetime,
-                            temphigh: r.tempHigh,
+                            tempHigh: r.tempHigh,
                             tempLow: r.tempLow,
                             rssiHigh: r.rssiHigh,
                             rssiLow: r.rssiLow
