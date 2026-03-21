@@ -17,7 +17,10 @@
 .sidebar.open {
   right: 0; 
 }
-.sidebar-content {
+
+/* Changed .sidebar-content to .sidebarContent to match React component */
+/* .sidebar-content { */
+.sidebarContent {
   container-type: size;
   container-name: sidebarArea;
   width: 100%;
@@ -28,16 +31,20 @@
   display: flex;
   flex-direction: column;
   border: 2px solid black;
+  box-sizing: border-box;
 }
 
-.sidebar [class^="chartContainer"] {
+/* Changed selector to target the class name used in React more reliably */
+/* .sidebar [class^="chartContainer"] { */
+.sidebar .chartContainer {
   /* flex: 1 0 50%; */
   /* height: 50%; */
-  flex: 0 0 50%;
+  flex: 1 1 50%;
   width: 100%;
   position: relative;
   box-sizing: border-box;
   border: 2px solid black;
+  overflow: hidden; 
 }
 
 /* @container sidebarArea (max-width: 600px) {
