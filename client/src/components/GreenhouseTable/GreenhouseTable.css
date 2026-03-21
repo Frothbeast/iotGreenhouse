@@ -1,6 +1,6 @@
 /* GreenhouseTable.css */
 
-.GreenhouseTableContainer {
+.greenhouseTableContainer {
   top: 0;
   display: inline-block;
   container-name: GreenhouseContainer;
@@ -15,23 +15,24 @@
   -ms-overflow-style: none;
 }
 
-.GreenhouseTableContainer::-webkit-scrollbar {
+.greenhouseTableContainer::-webkit-scrollbar {
     display: none;
 }
 
-.GreenhouseTable {
+.greenhouseTable {
   width: 100%;
   min-width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
-  /* Changed from auto to fixed to match sump logic */
-  table-layout: fixed; 
+  /* table-layout: auto; */
+  table-layout: fixed; /* Matches sumpTable.css for edge-to-edge layout */
   background-color: var(--menu-background);
   color: var(--menu-colour);
 }
 
 @container GreenhouseContainer (max-width:844px) {
-  .GreenhouseTable {
+  .greenhouseTable {
+    /* Updated font sizes to match sumpTable.css scale */
     --GreenhouseTable__header-font: 12cqw;
     --GreenhouseTable__data-font: 15cqw;
     --GreenhouseTable__header-smallFont: 3cqw;
@@ -40,70 +41,69 @@
   }
 }
 
-.GreenhouseTableHeader { 
+.greenhouseTableHeader { 
   top: var(--controlBar-height);
   position: sticky;
   z-index: 20;
   background-color: var(--menu-background);
 }
 
-/* Width calculation: 100% / 7 columns = 14.28% */
-.GreenhouseTableHeaderCell2Row1, 
-[class^="GreenhouseTableHeaderCell1Row"] {    
-  width: 14.28% !important; 
-  padding: 1px;            
-  text-align: center; 
+/* Column widths: 100% divided by 7 columns = 14.28% 
+   This prevents the data from bunching up on the left.
+*/
+.greenhouseTableHeaderCellRow1,
+.greenhouseTableHeaderCellRow2,
+.greenhouseTableHeaderCellRow3,
+.greenhouseTableHeaderCell1Row1,
+.greenhouseTableHeaderCell1Row2,
+.greenhouseTableHeaderCell2Row1,
+.greenhouseTableCell,
+.greenhouseTableCell1,
+.greenhouseTableCell2 {
+  width: 14.28% !important;
+  text-align: center;
+  padding: 8px 0;
 }
 
-.GreenhouseTableCell1, 
-.GreenhouseTableCell2,
-[class^="GreenhouseTableHeaderCell1Row"],
-[class^="GreenhouseTableHeaderCell2Row"] {
+.greenhouseTableCell1, 
+.greenhouseTableCell2,
+[class^="greenhouseTableHeaderCell1Row"],
+[class^="greenhouseTableHeaderCell2Row"] {
   position: sticky;
   left: 0;
   background-color: var(--menu-background);
   z-index: 10;
 }
 
-.GreenhouseTableHeaderCellRow1, .GreenhouseTableHeaderCell1Row1, .GreenhouseTableHeaderCell2Row1 {
+.greenhouseTableHeaderCellRow1, 
+.greenhouseTableHeaderCell1Row1 {
   height: var(--GreenhouseTable__headerRow-height);
   top: var(--controlBar-height);
+  font-size: var(--GreenhouseTable__header-font);
 } 
 
-.GreenhouseTableHeaderCell1Row1 {
+.greenhouseTableHeaderCell1Row1 {
   font-size: var(--GreenhouseTable__header-smallFont);
 } 
 
-.GreenhouseTableHeaderCellRow2, .GreenhouseTableHeaderCell1Row2, .GreenhouseTableHeaderCell2Row2  {
-  top: calc( var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
+.greenhouseTableHeaderCellRow2, 
+.greenhouseTableHeaderCell1Row2 {
+  top: calc(var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
 }
 
-.GreenhouseTableHeaderCellRow3, .GreenhouseTableHeaderCell1Row3, .GreenhouseTableHeaderCell2Row3  {
-  top: calc( 2 * var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
+.greenhouseTableHeaderCellRow3, 
+.greenhouseTableHeaderCell1Row3 {
+  top: calc(2 * var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
 }
 
-.GreenhouseTableHeaderCellRow4, .GreenhouseTableHeaderCell1Row4, .GreenhouseTableHeaderCell2Row4  {
-  top: calc( 3 * var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
+.greenhouseTableBody .greenhouseTableRow {
+    font-size: var(--GreenhouseTable__data-font);
 }
 
-.GreenhouseTable .GreenhouseTableCell {
-  word-spacing: normal; 
-  /* Changed from auto to proportional width */
-  width: 14.28%;          
-  display: table-cell;
-  text-align: center;
-  padding: 8px 0;
-}
-
-.GreenhouseTable td:not(:first-child) {
-  /* Ensuring consistency across all non-sticky cells */
-  width: 14.28%;
-}
-
-.GreenhouseTableCell1 {
-  width: 14.28% !important;
-}
-
-.GreenhouseTableBody .GreenhouseTableRow:nth-child(even) {
+.greenhouseTableBody .greenhouseTableRow:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+.greenhouseTableBody .greenhouseTableRow:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
