@@ -110,4 +110,9 @@
 
 .greenhouseTablePlaceholder{
   height: var(--greenhouseTable__header-height);
+
+}
+
+.greenhouseTableCell2 {
+    font-size: var(--GreenhouseTable__header-smallFont);
 }
