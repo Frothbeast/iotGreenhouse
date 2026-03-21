@@ -1,7 +1,7 @@
 import React from 'react';
 import './GreenhouseTable.css';
 
-const GreenhouseTable = ({ greenrecords = [], columnStats }) => {
+const GreenhouseTable = ({ records = [], columnStats }) => {
     if (!columnStats) return null;
 
     return (
