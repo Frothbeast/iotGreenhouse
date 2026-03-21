@@ -51,6 +51,10 @@ function App() {
           records={greenRecords}
           selectedHours={selectedHours} 
         />
+        <GreenhouseTable 
+          records={greenRecords} 
+          columnStats={columnStats} 
+        />
       </main>
     </div>
   );
