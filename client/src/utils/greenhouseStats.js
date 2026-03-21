@@ -20,11 +20,11 @@ export const calculateColumnStats  = (greenRecords) => {
   const dateObj = new Date(lastRecord.timestamp);
 
   return {
-    tempHigh: {avg: StatsLib.avg(tempHigh).toFixed(1),max: StatsLib.max(tempHigh).toFixed(1),min: StatsLib.min(tempHigh).toFixed(1)},
-    tempLow: {avg: StatsLib.avg(tempLow).toFixed(1),max: StatsLib.max(tempLow).toFixed(1),min: StatsLib.min(tempLow).toFixed(1)},
-    rssiHigh: {avg: StatsLib.avg(rssiHigh).toFixed(1),max: StatsLib.max(rssiHigh).toFixed(1),min: StatsLib.min(rssiHigh).toFixed(1)},
-    rssiLow: {avg: StatsLib.avg(rssiLow).toFixed(1),max: StatsLib.max(rssiLow).toFixed(1),min: StatsLib.min(rssiLow).toFixed(1)},
-    readingCount: {avg: StatsLib.avg(readingCount).toFixed(1),max: StatsLib.max(readingCount).toFixed(1),min: StatsLib.min(readingCount).toFixed(1)},
+    tempHigh: {avg: StatsLib.avg(tempHighs).toFixed(1),max: StatsLib.max(tempHighs).toFixed(1),min: StatsLib.min(tempHighs).toFixed(1)},
+    tempLow: {avg: StatsLib.avg(tempLows).toFixed(1),max: StatsLib.max(tempLows).toFixed(1),min: StatsLib.min(tempLows).toFixed(1)},
+    rssiHigh: {avg: StatsLib.avg(rssiHighs).toFixed(1),max: StatsLib.max(rssiHighs).toFixed(1),min: StatsLib.min(rssiHighs).toFixed(1)},
+    rssiLow: {avg: StatsLib.avg(rssiLows).toFixed(1),max: StatsLib.max(rssiLows).toFixed(1),min: StatsLib.min(rssiLows).toFixed(1)},
+    readingCount: {avg: StatsLib.avg(readingCounts).toFixed(1),max: StatsLib.max(readingCounts).toFixed(1),min: StatsLib.min(readingCounts).toFixed(1)},
 
     lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     lastDate: dateObj.toLocaleDateString(),
