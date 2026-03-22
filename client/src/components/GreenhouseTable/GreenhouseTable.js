@@ -10,13 +10,13 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 <thead className="greenhouseTableHeader">
                     <tr className="greenhouseTableHeaderRow1">
                         <th className="greenhouseTableHeaderCell1Row2"></th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller" id="">tempHigh °C</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">tempLow °C</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiHigh dB</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiLow dB</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiHigh NoDish dB</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiLow NoDish dB</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller">Reading Counts</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text" id="">tempHigh °C</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">tempLow °C</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiHigh dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiLow dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiHigh NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiLow NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">Reading Counts</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
                         <th className="greenhouseTableHeaderCell1Row2">MAX</th>
