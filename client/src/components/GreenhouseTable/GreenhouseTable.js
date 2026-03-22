@@ -14,7 +14,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">tempLow</th>
                         <th className="greenhouseTableHeaderCellRow1">rssiHigh</th>
                         <th className="greenhouseTableHeaderCellRow1">rssiLow</th>
-                        <th className="greenhouseTableHeaderCellRow1">Hadc</th>
+                        <th className="greenhouseTableHeaderCellRow1">Number of Readings</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
                         <th className="greenhouseTableHeaderCell1Row2">MAX</th>
