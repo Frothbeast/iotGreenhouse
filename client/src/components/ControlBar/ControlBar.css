@@ -98,7 +98,7 @@
   border: 1px solid black;
 }
 .chartContainer {
-  flex-basis: 100%;
+  flex-basis: 50%;
   position: relative;
   box-sizing: border-box;
   height: 50%;

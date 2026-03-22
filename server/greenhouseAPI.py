@@ -95,10 +95,37 @@ def get_data():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         unit = "DISH_UNIT"
-        query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
+        # query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
+        query = """
+        SELECT 
+            g1.datetime, 
+            g1.esp_ID, 
+            g1.tempHigh, 
+            g1.tempLow, 
+            g1.rssiHigh, 
+            g1.rssiLow, 
+            g1.readingCount, 
+            g1.notes,
+            (SELECT rssiHigh 
+             FROM greenhouseData 
+             WHERE esp_ID = 'RSSI_MONITOR_01' 
+             AND datetime BETWEEN g1.datetime - INTERVAL 5 MINUTE AND g1.datetime + INTERVAL 5 MINUTE
+             ORDER BY ABS(TIMESTAMPDIFF(SECOND, datetime, g1.datetime)) ASC 
+             LIMIT 1) AS rssiHighNoDish,
+            (SELECT rssiLow 
+             FROM greenhouseData 
+             WHERE esp_ID = 'RSSI_MONITOR_01' 
+             AND datetime BETWEEN g1.datetime - INTERVAL 5 MINUTE AND g1.datetime + INTERVAL 5 MINUTE
+             ORDER BY ABS(TIMESTAMPDIFF(SECOND, datetime, g1.datetime)) ASC 
+             LIMIT 1) AS rssiLowNoDish
+        FROM greenhouseData g1
+        WHERE g1.esp_ID = %s 
+        AND g1.datetime > NOW() - INTERVAL %s HOUR 
+        ORDER BY g1.datetime DESC;
+        """
         cursor.execute(query, (unit, int(hours)))
         rows = cursor.fetchall()
-        #print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
+        # print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
         cursor.close()
         conn.close()
 

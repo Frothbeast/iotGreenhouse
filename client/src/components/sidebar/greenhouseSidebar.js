@@ -91,6 +91,24 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
             options={optRSSI}
           />
         </div>
+        <div className="chartContainer">
+          <GreenhouseChart
+            labels={labels}
+            datasets={[
+              {
+                label: "High RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiHighNoDish)
+              },
+              {
+                label: "Low RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiLowNoDish)
+              }
+            ]}
+            options={optRSSI}
+          />
+        </div>
       </div>
     </div>
   );

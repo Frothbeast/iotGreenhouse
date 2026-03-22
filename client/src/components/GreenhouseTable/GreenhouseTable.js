@@ -10,10 +10,12 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 <thead className="greenhouseTableHeader">
                     <tr className="greenhouseTableHeaderRow1">
                         <th className="greenhouseTableHeaderCell1Row2"></th>
-                        <th className="greenhouseTableHeaderCellRow1">tempHigh</th>
-                        <th className="greenhouseTableHeaderCellRow1">tempLow</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiHigh</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiLow</th>
+                        <th className="greenhouseTableHeaderCellRow1">temp High</th>
+                        <th className="greenhouseTableHeaderCellRow1">temp Low</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssi High</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssi Low</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiHigh NoDish</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiLow NoDish</th>
                         <th className="greenhouseTableHeaderCellRow1">Number of Readings</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
@@ -22,6 +24,8 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.tempLow.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.max}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.max}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.max}</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow3">
@@ -30,6 +34,8 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.tempLow.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.avg}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.avg}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.avg}</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow3">
@@ -38,6 +44,8 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.tempLow.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.min}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.min}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.min}</th>
                     </tr>
                 </thead>
@@ -52,6 +60,8 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                             <td className="greenhouseTableCell">{record.tempLow ?? "N/a"}°C</td>
                             <td className="greenhouseTableCell">{record.rssiHigh ?? "N/a"}dB</td>
                             <td className="greenhouseTableCell">{record.rssiLow ?? "N/a"}dB</td>
+                            <td className="greenhouseTableCell">{record.rssiHighNoDish ?? "N/a"}dB</td>
+                            <td className="greenhouseTableCell">{record.rssiLowNoDish ?? "N/a"}dB</td>
                             <td className="greenhouseTableCell">{record.readingCount ?? "N/a"}</td>
                         </tr>
                     ))}
