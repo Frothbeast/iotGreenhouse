@@ -50,7 +50,7 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
       </div>
 
       <div className="chartSection">
-        <div className="chartContainer">
+        <div className="chartContainer" id="tempChart">
           <div className="chartWatermark">TEMP</div>
           <GreenhouseChart
             labels={records.map((_, i) => i)}

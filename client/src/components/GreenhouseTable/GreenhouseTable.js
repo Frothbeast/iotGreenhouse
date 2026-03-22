@@ -10,13 +10,13 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 <thead className="greenhouseTableHeader">
                     <tr className="greenhouseTableHeaderRow1">
                         <th className="greenhouseTableHeaderCell1Row2"></th>
-                        <th className="greenhouseTableHeaderCellRow1">temp High</th>
-                        <th className="greenhouseTableHeaderCellRow1">temp Low</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssi High</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssi Low</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiHigh NoDish</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiLow NoDish</th>
-                        <th className="greenhouseTableHeaderCellRow1">Number of Readings</th>
+                        <th className="greenhouseTableHeaderCellRow1">tempHigh °C</th>
+                        <th className="greenhouseTableHeaderCellRow1">tempLow °C</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiHigh dB</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiLow dB</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiHigh NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1">rssiLow NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1">Reading Counts</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
                         <th className="greenhouseTableHeaderCell1Row2">MAX</th>
@@ -56,12 +56,12 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                             <td className="greenhouseTableCell2">
                                 {record.datetime ? record.datetime.split(/[ T]/)[1].substring(0, 5) : "N/a"}
                             </td>
-                            <td className="greenhouseTableCell">{record.tempHigh ?? "N/a"}°C</td>
-                            <td className="greenhouseTableCell">{record.tempLow ?? "N/a"}°C</td>
-                            <td className="greenhouseTableCell">{record.rssiHigh ?? "N/a"}dB</td>
-                            <td className="greenhouseTableCell">{record.rssiLow ?? "N/a"}dB</td>
-                            <td className="greenhouseTableCell">{record.rssiHighNoDish ?? "N/a"}dB</td>
-                            <td className="greenhouseTableCell">{record.rssiLowNoDish ?? "N/a"}dB</td>
+                            <td className="greenhouseTableCell">{record.tempHigh ?? "N/a"}</td>
+                            <td className="greenhouseTableCell">{record.tempLow ?? "N/a"}</td>
+                            <td className="greenhouseTableCell">{record.rssiHigh ?? "N/a"}</td>
+                            <td className="greenhouseTableCell">{record.rssiLow ?? "N/a"}</td>
+                            <td className="greenhouseTableCell">{record.rssiHighNoDish ?? "N/a"}</td>
+                            <td className="greenhouseTableCell">{record.rssiLowNoDish ?? "N/a"}</td>
                             <td className="greenhouseTableCell">{record.readingCount ?? "N/a"}</td>
                         </tr>
                     ))}

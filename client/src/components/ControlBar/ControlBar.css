@@ -104,6 +104,11 @@
   height: 50%;
   border: 1px solid black;
 }
+
+#tempChart{
+  flex-basis: 100%;
+}
+
 .chartContainer canvas {
   width: 100% !important;
   height: 100% !important;
