@@ -199,7 +199,7 @@ def handle_cl1p_sync():
                                 """
                             cursor.execute(query, (ts, item.get('esp_ID'), item.get('tempHigh'),
                                                    item.get('tempLow'), item.get('rssiHigh'),
-                                                   item.get('rssiLow'), item.get('readingCounts'),
+                                                   item.get('rssiLow'), item.get('readingCount'),
                                                    item.get('notes')))
                     conn.commit()
                     cursor.close()
