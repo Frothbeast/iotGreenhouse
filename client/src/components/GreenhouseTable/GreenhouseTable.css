@@ -125,7 +125,6 @@
 }
 
 .stack-text {
-  display: inline-block; /* or block */
   word-spacing: 100vw;   /* Forces the next word to the next line */
   white-space: normal;   /* Ensures wrapping is allowed */
   word-break: keep-all;  /* Prevents the words themselves from breaking */
