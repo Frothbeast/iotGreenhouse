@@ -29,16 +29,14 @@
   background-color: var(--menu-background);
   color: var(--menu-colour);
 }
-
-@container GreenhouseContainer (max-width:844px) {
-  .greenhouseTable {
-    /* Updated font sizes to match sumpTable.css scale */
-    --GreenhouseTable__header-font: 4cqw;
-    --GreenhouseTable__data-font: 4cqw;
-    --GreenhouseTable__header-smallFont: 3cqw;
-    --GreenhouseTable__header-height: 31cqw;
-    --GreenhouseTable__headerRow-height: 5cqw; 
-  }
+:root {    
+  --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
+  --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
+  --greenhouseTable__header-font: 4cqw;
+  --greenhouseTable__data-font: 4cqw;
+  --greenhouseTable__header-smallFont: 2.5cqw;
+  --greenhouseTable__headerRow-height: 5.5cqw; 
+  --greenhouseTable__header-height: calc(3 * var(--greenhouseTable__headerRow-height));
 }
 
 .greenhouseTableHeader { 
@@ -81,27 +79,27 @@
 
 .greenhouseTableHeaderCellRow1, 
 .greenhouseTableHeaderCell1Row1 {
-  height: var(--GreenhouseTable__headerRow-height);
+  height: var(--greenhouseTable__headerRow-height);
   top: var(--controlBar-height);
-  font-size: var(--GreenhouseTable__header-smallFont);
+  font-size: var(--greenhouseTable__header-smallFont);
 } 
 
 .greenhouseTableHeaderCell1Row1 {
-  font-size: var(--GreenhouseTable__header-font);
+  font-size: var(--greenhouseTable__header-font);
 } 
 
 .greenhouseTableHeaderCellRow2, 
 .greenhouseTableHeaderCell1Row2 {
-  top: calc(var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
+  top: calc(var(--greenhouseTable__headerRow-height) + var(--controlBar-height));
 }
 
 .greenhouseTableHeaderCellRow3, 
 .greenhouseTableHeaderCell1Row3 {
-  top: calc(2 * var(--GreenhouseTable__headerRow-height) + var(--controlBar-height));
+  top: calc(2 * var(--greenhouseTable__headerRow-height) + var(--controlBar-height));
 }
 
 .greenhouseTableBody .greenhouseTableRow {
-    font-size: var(--GreenhouseTable__data-font);
+    font-size: var(--greenhouseTable__data-font);
 }
 
 .greenhouseTableBody .greenhouseTableRow:nth-child(even) {
@@ -118,5 +116,16 @@
 }
 
 .greenhouseTableCell2 {
-    font-size: var(--GreenhouseTable__header-smallFont);
+    font-size: var(--greenhouseTable__header-smallFont);
+}
+
+.stack-text {
+  word-spacing: 100vw;   /* Forces the next word to the next line */
+  white-space: normal;   /* Ensures wrapping is allowed */
+  word-break: keep-all;  /* Prevents the words themselves from breaking */
+}
+
+.smaller{
+  --greenhouseTable__header-smallFont: 2.5cqw;  
+
 }

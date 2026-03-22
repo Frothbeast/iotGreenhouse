@@ -50,7 +50,7 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
       </div>
 
       <div className="chartSection">
-        <div className="chartContainer">
+        <div className="chartContainer" id="tempChart">
           <div className="chartWatermark">TEMP</div>
           <GreenhouseChart
             labels={records.map((_, i) => i)}
@@ -83,6 +83,25 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
                 label: "Low RSSI",
                 color: "cyan",
                 data: records.map(r => r.rssiLow)
+              }
+            ]}
+            options={getOptions(-100, 0)}
+          />
+        </div>
+                <div className="chartContainer">
+          <div className="chartWatermark">RSSI NO DISH</div>
+          <GreenhouseChart
+            labels={records.map((_, i) => i)}
+            datasets={[
+              {
+                label: "High RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiHighNoDish)
+              },
+              {
+                label: "Low RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiLowNoDish)
               }
             ]}
             options={getOptions(-100, 0)}

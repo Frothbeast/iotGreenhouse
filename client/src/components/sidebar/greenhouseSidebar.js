@@ -55,7 +55,7 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebarContent">
-        <div className="chartContainer">
+        <div className="chartContainer" id="tempChart">
           <GreenhouseChart
             labels={labels}
             datasets={[
@@ -86,6 +86,24 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
                 label: "Low RSSI",
                 color: "cyan",
                 data: records.map(r => r.rssiLow)
+              }
+            ]}
+            options={optRSSI}
+          />
+        </div>
+        <div className="chartContainer">
+          <GreenhouseChart
+            labels={labels}
+            datasets={[
+              {
+                label: "High RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiHighNoDish)
+              },
+              {
+                label: "Low RSSI No Dish",
+                color: "cyan",
+                data: records.map(r => r.rssiLowNoDish)
               }
             ]}
             options={optRSSI}

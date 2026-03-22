@@ -18,38 +18,35 @@
   right: 0; 
 }
 
-/* Changed .sidebar-content to .sidebarContent to match React component */
-/* .sidebar-content { */
 .sidebarContent {
   container-type: size;
   container-name: sidebarArea;
   width: 100%;
   height: 100%;
-  /* display: flex; */
-  /* flex-wrap: wrap; */
-  /* align-content: stretch; */
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   border: 2px solid black;
   box-sizing: border-box;
 }
 
-/* Changed selector to target the class name used in React more reliably */
-/* .sidebar [class^="chartContainer"] { */
 .sidebar .chartContainer {
-  /* flex: 1 0 50%; */
-  /* height: 50%; */
-  flex: 1 1 50%;
-  width: 100%;
+  flex: 0 0 50%;
+  height: 50%;
   position: relative;
   box-sizing: border-box;
   border: 2px solid black;
   overflow: hidden; 
 }
 
-/* @container sidebarArea (max-width: 600px) {
+#tempChart {
+  flex: 0 0 100%; 
+  width: 100%;
+  height: 50%;
+}
+
+ @container sidebarArea (max-width: 600px) {
   .sidebar [class^="chartContainer"] {
     flex-basis: 100%;
-    height: 50%;
+    height: 33.33%; 
   }
-} */
+}

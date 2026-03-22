@@ -10,8 +10,10 @@ export const calculateColumnStats  = (greenRecords) => {
 
   const tempHighs = greenRecords.map(r => parseFloat(r.tempHigh)).filter(v => !isNaN(v));
   const rssiHighs = greenRecords.map(r => parseInt(r.rssiHigh)).filter(v => !isNaN(v));
+  const rssiHighNoDishs = greenRecords.map(r => parseInt(r.rssiHighNoDish)).filter(v => !isNaN(v));
   const tempLows = greenRecords.map(r => parseFloat(r.tempLow)).filter(v => !isNaN(v));
   const rssiLows = greenRecords.map(r => parseInt(r.rssiLow)).filter(v => !isNaN(v));
+  const rssiLowNoDishs = greenRecords.map(r => parseInt(r.rssiLowNoDish)).filter(v => !isNaN(v));
   const readingCounts = greenRecords.map(r => parseInt(r.readingCount)).filter(v => !isNaN(v));
 
   const lastRecord = greenRecords[0];
@@ -22,6 +24,8 @@ export const calculateColumnStats  = (greenRecords) => {
     tempLow: {avg: StatsLib.avg(tempLows).toFixed(1),max: StatsLib.max(tempLows).toFixed(1),min: StatsLib.min(tempLows).toFixed(1)},
     rssiHigh: {avg: StatsLib.avg(rssiHighs).toFixed(1),max: StatsLib.max(rssiHighs).toFixed(1),min: StatsLib.min(rssiHighs).toFixed(1)},
     rssiLow: {avg: StatsLib.avg(rssiLows).toFixed(1),max: StatsLib.max(rssiLows).toFixed(1),min: StatsLib.min(rssiLows).toFixed(1)},
+    rssiHighNoDish: {avg: StatsLib.avg(rssiHighNoDishs).toFixed(1),max: StatsLib.max(rssiHighNoDishs).toFixed(1),min: StatsLib.min(rssiHighNoDishs).toFixed(1)},
+    rssiLowNoDish: {avg: StatsLib.avg(rssiLowNoDishs).toFixed(1),max: StatsLib.max(rssiLowNoDishs).toFixed(1),min: StatsLib.min(rssiLowNoDishs).toFixed(1)},
     readingCount: {avg: StatsLib.avg(readingCounts).toFixed(1),max: StatsLib.max(readingCounts).toFixed(1),min: StatsLib.min(readingCounts).toFixed(1)},
 
     lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),

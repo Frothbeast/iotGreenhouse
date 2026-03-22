@@ -98,12 +98,17 @@
   border: 1px solid black;
 }
 .chartContainer {
-  flex-basis: 100%;
+  flex-basis: 50%;
   position: relative;
   box-sizing: border-box;
   height: 50%;
   border: 1px solid black;
 }
+
+#tempChart{
+  flex-basis: 100%;
+}
+
 .chartContainer canvas {
   width: 100% !important;
   height: 100% !important;
