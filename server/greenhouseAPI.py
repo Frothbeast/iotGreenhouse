@@ -133,7 +133,7 @@ def handle_cl1p_sync():
     headers = {"Content-Type": "text/plain", "cl1papitoken": CL1P_TOKEN}
 
     try:
-        if location == "home":
+        if LOCATION == "home":
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
@@ -192,7 +192,7 @@ def handle_cl1p_sync():
                                         tempLow,
                                         rssiHigh,
                                         rssiLow,
-                                        readingCounts,
+                                        readingCount,
                                         notes
                                     )
                                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
