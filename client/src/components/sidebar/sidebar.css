@@ -42,7 +42,10 @@
   border: 2px solid black;
   overflow: hidden; 
 }
-
+#tempChart{
+  flex: 1 1 50%;
+  width: 100%;
+}
  @container sidebarArea (max-width: 600px) {
   .sidebar [class^="chartContainer"] {
     flex-basis: 100%;

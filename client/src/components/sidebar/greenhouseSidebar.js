@@ -55,7 +55,7 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebarContent">
-        <div className="chartContainer">
+        <div className="chartContainer" id="tempChart">
           <GreenhouseChart
             labels={labels}
             datasets={[
