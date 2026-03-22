@@ -91,14 +91,14 @@ def bootstrap_db():
 def get_data():
     try:
         hours = request.args.get('hours', default=24, type=int)
-        print(f"DEBUG: Fetching data for last {hours} hours", file=sys.stderr, flush=True)
+        # print(f"DEBUG: Fetching data for last {hours} hours", file=sys.stderr, flush=True)
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         unit = "DISH_UNIT"
         query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE esp_ID = %s AND datetime > NOW() - INTERVAL %s HOUR ORDER BY datetime DESC;"
         cursor.execute(query, (unit, int(hours)))
         rows = cursor.fetchall()
-        print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
+        #print(f"DEBUG: Found {len(rows)} rows", file=sys.stderr, flush=True)
         cursor.close()
         conn.close()
 
@@ -140,20 +140,27 @@ def handle_cl1p_sync():
     try:
         if LOCATION == "home":
             conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "Failed to connect to local database"}), 500
             cursor = conn.cursor(dictionary=True)
             query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE datetime >= NOW() - INTERVAL 7 DAY"
             cursor.execute(query)
             rows = cursor.fetchall()
 
             for row in rows:
-                if isinstance(row['datetime'], datetime):
-                    row['datetime'] = str(row['datetime'])
-                # Convert Decimals/Ints to strings for the payload
-                for key in ['tempHigh', 'tempLow', 'rssiHigh', 'rssiLow', 'readingCount', 'esp_ID']:
-                    row[key] = str(row[key])
+                for key, value in row.items():
+                    if isinstance(value, datetime):
+                        row[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+                    elif value is None:
+                        row[key] = ""
+                    else:
+                        row[key] = str(value)
 
             long_string_payload = json.dumps(rows)
-            response = requests.post(CL1P_URL, data=long_string_payload, headers=headers, verify=False)
+
+            response = requests.post(CL1P_URL, data=long_string_payload, headers=headers, verify=False, timeout=10)
+            if response.status_code != 200:
+                return jsonify({"error": f"Cl1p rejected data: {response.status_code}"}), 500
 
             cursor.close()
             conn.close()
