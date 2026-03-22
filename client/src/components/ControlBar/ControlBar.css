@@ -5,7 +5,7 @@
   right: 0;
   z-index: 1000;
   height: var(--controlBar-height); 
-  background: rgba(44, 62, 80, 0.541);
+  background: rgba(44, 62, 80, 1);
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
@@ -98,7 +98,7 @@
   border: 1px solid black;
 }
 .chartContainer {
-  flex-basis: 50%;
+  flex-basis: 100%;
   position: relative;
   box-sizing: border-box;
   height: 50%;
