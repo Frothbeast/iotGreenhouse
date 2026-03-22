@@ -130,84 +130,82 @@ def serve(path):
 @app.route('/api/cl1p', methods=['POST'])
 def handle_cl1p_sync():
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    headers = {"Content-Type": "text/plain", "cl1papitoken": CL1P_TOKEN}
+    # Added Cache-Control to ensure we get the latest data from cl1p
+    headers = {
+        "Content-Type": "text/plain",
+        "cl1papitoken": CL1P_TOKEN,
+        "Cache-Control": "no-cache"
+    }
 
     try:
         if LOCATION == "home":
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
-
-            query = """
-                SELECT datetime,
-                    esp_ID,
-                    tempHigh,
-                    tempLow,
-                    rssiHigh,
-                    rssiLow,
-                    readingCount,
-                    notes
-                FROM greenhouseData
-                WHERE datetime >= NOW() - INTERVAL 7 DAY
-            """
+            query = "SELECT datetime, esp_ID, tempHigh, tempLow, rssiHigh, rssiLow, readingCount, notes FROM greenhouseData WHERE datetime >= NOW() - INTERVAL 7 DAY"
             cursor.execute(query)
             rows = cursor.fetchall()
 
             for row in rows:
                 if isinstance(row['datetime'], datetime):
                     row['datetime'] = str(row['datetime'])
-                    row['tempHigh'] = str(row['tempHigh'])
-                    row['tempLow'] = str(row['tempLow'])
-                    row['rssiHigh'] = str(row['rssiHigh'])
-                    row['rssiLow'] = str(row['rssiLow'])
-                    row['readingCount'] = str(row['readingCount'])
-                    row['notes'] = str(row['notes'])
-                    row['esp_ID'] = str(row['esp_ID'])
-
+                # Convert Decimals/Ints to strings for the payload
+                for key in ['tempHigh', 'tempLow', 'rssiHigh', 'rssiLow', 'readingCount', 'esp_ID']:
+                    row[key] = str(row[key])
 
             long_string_payload = json.dumps(rows)
             response = requests.post(CL1P_URL, data=long_string_payload, headers=headers, verify=False)
 
             cursor.close()
             conn.close()
+            print(f"HOME: Pushed {len(rows)} rows to cl1p. Status: {response.status_code}")
             return jsonify({"status": "pushed to cl1p", "count": len(rows)}), 200
 
         elif LOCATION == "work":
             response = requests.get(CL1P_URL, headers=headers, verify=False)
+            print(f"WORK: Cl1p GET Status: {response.status_code}")
 
             if response.status_code == 200:
-                cl1p_payloads = json.loads(response.text)
+                # Use strip() to remove any trailing newlines cl1p might add
+                raw_text = response.text.strip()
+                if not raw_text:
+                    print("WORK: cl1p is empty.")
+                    return jsonify({"status": "cl1p empty"}), 200
+
+                cl1p_payloads = json.loads(raw_text)
+
                 if isinstance(cl1p_payloads, list):
                     conn = get_db_connection()
-                    if not conn: return jsonify({"error": "DB Connection Timeout"}), 500
                     cursor = conn.cursor()
+                    added_count = 0
 
                     for item in cl1p_payloads:
                         ts = item.get('datetime')
                         cursor.execute("SELECT COUNT(*) FROM greenhouseData WHERE datetime = %s", (ts,))
                         if cursor.fetchone()[0] == 0:
                             query = """
-                                    INSERT INTO greenhouseData (datetime,
-                                        esp_ID,
-                                        tempHigh,
-                                        tempLow,
-                                        rssiHigh,
-                                        rssiLow,
-                                        readingCount,
-                                        notes
-                                    )
+                                    INSERT INTO greenhouseData (datetime, esp_ID, tempHigh, tempLow, 
+                                        rssiHigh, rssiLow, readingCount, notes)
                                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                                 """
                             cursor.execute(query, (ts, item.get('esp_ID'), item.get('tempHigh'),
                                                    item.get('tempLow'), item.get('rssiHigh'),
                                                    item.get('rssiLow'), item.get('readingCount'),
                                                    item.get('notes')))
+                            added_count += 1
+
                     conn.commit()
                     cursor.close()
                     conn.close()
-            return '', 204
+                    print(f"WORK: Successfully added {added_count} new rows.")
+                    return jsonify({"status": "pulled", "added": added_count}), 200
+
+            return jsonify({"status": "no data", "code": response.status_code}), 200
+
     except Exception as e:
+        print(f"SYNC ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+    
 if __name__ == '__main__':
     bootstrap_db()
     port_env = int(os.getenv('API_PORT'))
