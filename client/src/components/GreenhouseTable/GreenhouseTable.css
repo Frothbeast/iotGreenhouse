@@ -34,7 +34,7 @@
   --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
   --greenhouseTable__header-font: 4cqw;
   --greenhouseTable__data-font: 4cqw;
-  --greenhouseTable__header-smallFont: 3cqw;
+  --greenhouseTable__header-smallFont: 2.5cqw;
   --greenhouseTable__headerRow-height: 5.5cqw; 
   --greenhouseTable__header-height: calc(3 * var(--greenhouseTable__headerRow-height));
 }
@@ -123,4 +123,9 @@
   word-spacing: 100vw;   /* Forces the next word to the next line */
   white-space: normal;   /* Ensures wrapping is allowed */
   word-break: keep-all;  /* Prevents the words themselves from breaking */
+}
+
+.smaller{
+  --greenhouseTable__header-smallFont: 2.5cqw;  
+
 }
