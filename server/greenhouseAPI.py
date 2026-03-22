@@ -165,14 +165,14 @@ def handle_cl1p_sync():
 
 
             long_string_payload = json.dumps(rows)
-            response = requests.post(cl1pURL, data=long_string_payload, headers=headers, verify=False)
+            response = requests.post(CL1P_URL, data=long_string_payload, headers=headers, verify=False)
 
             cursor.close()
             conn.close()
             return jsonify({"status": "pushed to cl1p", "count": len(rows)}), 200
 
         elif LOCATION == "work":
-            response = requests.get(cl1pURL, headers=headers, verify=False)
+            response = requests.get(CL1P_URL, headers=headers, verify=False)
 
             if response.status_code == 200:
                 cl1p_payloads = json.loads(response.text)
