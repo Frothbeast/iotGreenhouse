@@ -23,9 +23,9 @@
   /*greenhouseTable needs */
   --greenhouseTable__header-height: 15cqw;    
   --greenhouseTable__headerRow-height: 4cqw; 
-  --greenhouseTable__header-font: 4cqw;       
+  --greenhouseTable__header-font: 5cqw;       
   --greenhouseTable__header-smallFont: 4cqw;  
-  --greenhouseTable__data-font: 6cqw;      
+  --greenhouseTable__data-font: 8cqw;      
   --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
   --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
 }
