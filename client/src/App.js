@@ -54,7 +54,7 @@ function App() {
         selectedHours={selectedHours}
         onHoursChange={setSelectedHours}
         columnStats={columnStats}
-        // 3. Pass GreenRecords to ControlBar
+        cl1pClick={cl1pClick}
         records={greenRecords}
         toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
