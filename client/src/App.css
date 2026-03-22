@@ -20,16 +20,7 @@
   --border-radius: 1px;
   /* Control Bar needs */
   --controlBar-height: 15vw;
-  /*greenhouseTable needs */
-      
-  --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
-  --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
 
-  --greenhouseTable__header-font: 4cqw;
-  --greenhouseTable__data-font: 4cqw;
-  --greenhouseTable__header-smallFont: 3cqw;
-  --greenhouseTable__header-height: 31cqw;
-  --greenhouseTable__headerRow-height: 5cqw; 
 }
 
 @media (prefers-color-scheme: dark) {

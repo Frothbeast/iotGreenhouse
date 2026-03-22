@@ -29,16 +29,28 @@
   background-color: var(--menu-background);
   color: var(--menu-colour);
 }
+:root {    
+  --greenhouseTable__header-backgroundColour: color-mix(in oklch, var(--menu-background), white 30%);
+  --greenhouseTable__header-colour: color-mix(in oklch, var(--menu-colour), white 30%);
+
+  /* Default heights for desktop/large screens */
+  --greenhouseTable__header-font: 16px;
+  --greenhouseTable__data-font: 14px;
+  --greenhouseTable__header-smallFont: 12px;
+  --greenhouseTable__headerRow-height: 40px; 
+  /* Total height = 3 rows * row-height */
+  --greenhouseTable__header-height: calc(3 * var(--greenhouseTable__headerRow-height));
+}
 
 @container GreenhouseContainer (max-width:844px) {
   .greenhouseTable {
-    /* Updated font sizes to match sumpTable.css scale */
     --greenhouseTable__header-font: 4cqw;
     --greenhouseTable__data-font: 4cqw;
     --greenhouseTable__header-smallFont: 3cqw;
-    --greenhouseTable__header-height: 31cqw;
-    --greenhouseTable__headerRow-height: 5cqw; 
+    --greenhouseTable__headerRow-height: 10cqw; /* Adjusted for better mobile tap targets */
+    --greenhouseTable__header-height: 31cqw; 
   }
+
   .smaller{
     --greenhouseTable__header-smallFont: 2.5cqw;
   }
