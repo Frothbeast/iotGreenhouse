@@ -18,6 +18,21 @@ function App() {
 
   const [serverTime, setServerTime] = useState("00:00 AM");
 
+  const cl1pClick = async () => {
+    try{
+      const response = await fetch(`/api/cl1p`, {method: 'POST', });
+      if (response.status === 204) {
+          console.log("Action acknowledged by server.");
+      }
+      else {
+        console.error("Server returned an error");
+      }
+    }
+    catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
   const updateTime = () => {
     fetch('/api/time')
       .then(res => res.json())
