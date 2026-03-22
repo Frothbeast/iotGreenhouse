@@ -25,7 +25,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.max}</th>
-                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.max}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLowNoDish.max}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.max}</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow3">
@@ -35,7 +35,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.avg}</th>
-                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.avg}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLowNoDish.avg}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.avg}</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow3">
@@ -45,7 +45,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHigh.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLow.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiHighNoDish.min}</th>
-                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiNoDish.min}</th>
+                        <th className="greenhouseTableHeaderCellRow1">{columnStats.rssiLowNoDish.min}</th>
                         <th className="greenhouseTableHeaderCellRow1">{columnStats.readingCount.min}</th>
                     </tr>
                 </thead>
