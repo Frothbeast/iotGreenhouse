@@ -10,13 +10,13 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                 <thead className="greenhouseTableHeader">
                     <tr className="greenhouseTableHeaderRow1">
                         <th className="greenhouseTableHeaderCell1Row2"></th>
-                        <th className="greenhouseTableHeaderCellRow1">tempHigh °C</th>
-                        <th className="greenhouseTableHeaderCellRow1">tempLow °C</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiHigh dB</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiLow dB</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiHigh NoDish dB</th>
-                        <th className="greenhouseTableHeaderCellRow1">rssiLow NoDish dB</th>
-                        <th className="greenhouseTableHeaderCellRow1">Reading Counts</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller" id="">tempHigh °C</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">tempLow °C</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiHigh dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiLow dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiHigh NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">rssiLow NoDish dB</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller">Reading Counts</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
                         <th className="greenhouseTableHeaderCell1Row2">MAX</th>
@@ -53,7 +53,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                     <tr className="greenhouseTablePlaceholder"></tr>
                     {Array.isArray(records) && records.map((record) => (
                         <tr key={record.id} className="greenhouseTableRow">
-                            <td className="greenhouseTableCell2">
+                            <td className="greenhouseTableCell2  smaller">
                                 {record.datetime ? record.datetime.split(/[ T]/)[1].substring(0, 5) : "N/a"}
                             </td>
                             <td className="greenhouseTableCell">{record.tempHigh ?? "N/a"}</td>

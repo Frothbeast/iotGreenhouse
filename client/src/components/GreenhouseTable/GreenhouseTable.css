@@ -39,6 +39,9 @@
     --GreenhouseTable__header-height: 31cqw;
     --GreenhouseTable__headerRow-height: 5cqw; 
   }
+  .smaller{
+    --GreenhouseTable__header-smallFont: 2.5cqw;
+  }
 }
 
 .greenhouseTableHeader { 
