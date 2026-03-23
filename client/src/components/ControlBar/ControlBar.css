@@ -83,7 +83,33 @@
   justify-content: space-around;
   width: 100%;
 }
+.myBUTTon {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  padding: 10px 20px;
+  background-color: var(--menu-background);
+  color: var(--menu-colour);
+}
 
+button, 
+input[type="button"], 
+input[type="submit"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  border: 1px solid var(--menu-colour);
+  background-color: var(--menu-background); /* Match your theme */
+  color: var(--menu-colour);
+}
+
+.myBUTTon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+}
 .chartSection {
   position: relative;
   margin: 0;
