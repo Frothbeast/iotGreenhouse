@@ -18,9 +18,10 @@ export function useGreenhouseData(hours) {
                             tempHigh: r.tempHigh,
                             tempLow: r.tempLow,
                             rssiHigh: r.rssiHigh,
-                            rssiLow: r.rssiLowNoDish,
-                            rssiHigh: r.rssiHighNoDish,
-                            rssiLow: r.rssiLow,readingCount: r.readingCount
+                            rssiLow: r.rssiLow,
+                            rssiHighNoDish: r.rssiHighNoDish,
+                            rssiLowNoDIsh: r.rssiLowNoDish,
+                            readingCount: r.readingCount
                     }));
                         setGreenRecords(mappedData);
                     }
