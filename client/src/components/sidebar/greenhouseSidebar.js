@@ -36,7 +36,7 @@ const GreenhouseSidebar = ({ isOpen, records, selectedHours }) => {
     scales: {
       x: {
         type: 'time',
-        time: { unit: unit, displayFormats: { minute: 'h:mm a', hour: 'MMM d:ha', day: 'MMM d:ha' } },
+        time: { unit: unit, displayFormats: { minute: 'h:mm', hour: 'ha', day: 'MMM d:ha' } },
         ticks: { color: 'lightgrey', font: { size: 14 } },
         grid: { color: 'rgba(255,255,255,0.1)' }
       },
