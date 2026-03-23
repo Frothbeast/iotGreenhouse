@@ -39,7 +39,7 @@
   --greenhouseTable__header-height: calc(3 * var(--greenhouseTable__headerRow-height));
 }
 @container GreenhouseContainer (min-width: 1200px) {
-  :root{
+.greenhouseTableContainer {
   --greenhouseTable__header-font: 3cqw;
   --greenhouseTable__data-font: 3cqw;
   --greenhouseTable__header-smallFont: 1.75cqw;
