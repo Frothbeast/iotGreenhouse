@@ -87,9 +87,10 @@
   -webkit-appearance: none;
   appearance: none;
   border-radius: 0;
-  padding: 10px 20px;
-  background-color: var(--menu-background);
-  color: var(--menu-colour);
+  padding: 0;
+  background-color: var(--menu-colour);
+  color: var(--menu-background);
+  overflow: hidden;
 }
 
 button, 

@@ -35,9 +35,19 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
           <span className="value">{columnStats?.lastTime ?? "N/a"}</span>
           <span className="unit">{columnStats?.lastDate ?? "N/a"}</span>
         </div>
+        <div className="lastTemp">
+          <span className="label">Temperature</span>
+          <span className="value">{columnStats?.lastTemp ?? "N/a"}</span>
+          <span className="unit">°C</span>
+        </div>
+        <div className="lastCount">
+          <span className="label">Last Counts</span>
+          <span className="value">{columnStats?.lastCount ?? "N/a"}</span>
+          <span className="unit">Counts/10 min</span>
+        </div>
         <div className="buttonRow">
           <button className="sidebarButton myBUTTon" onClick={toggleSidebar}>
-            {isSidebarOpen ? "Close Chart" : "View Graph"}
+            {isSidebarOpen ? "Table" : "Graph"}
           </button>
           <button onClick={cl1pClick} className="cl1pButton myBUTTon">CL1P</button>
           <select className="selectedHours myBUTTon" value={selectedHours} onChange={(e) => onHoursChange(Number(e.target.value))}>
