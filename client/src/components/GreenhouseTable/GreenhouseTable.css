@@ -44,7 +44,7 @@
     --greenhouseTable__data-font: 3cqw;
     --greenhouseTable__header-smallFont: 1.75cqw;
     --greenhouseTable__headerRow-height: 4.5cqw; 
-    --greenhouseTable__header-height: calc(3 * var(--greenhouseTable__headerRow-height));
+    --greenhouseTable__header-height: calc(4 * var(--greenhouseTable__headerRow-height));
   }
 }
 
