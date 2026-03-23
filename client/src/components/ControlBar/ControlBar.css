@@ -54,7 +54,7 @@
   align-items: center;
 }
 
-.lastRun, .lastRunPeriod, .hoursSincePowerup{
+.lastRun, .lastCount, .lastTemp{
   flex: 1;
   display: flex;
   align-items: center;

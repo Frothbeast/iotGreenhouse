@@ -30,6 +30,7 @@ export const calculateColumnStats  = (greenRecords) => {
 
     lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     lastDate: dateObj.toLocaleDateString(),
-    lastCount: lastRecord.readingCount
+    lastCount: lastRecord.readingCount,
+    lastTemp: (lastRecord.tempHigh + lastRecord.tempLow)/2
   };
 };
