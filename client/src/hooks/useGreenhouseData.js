@@ -18,7 +18,7 @@ export function useGreenhouseData(hours) {
                             tempHigh: r.tempHigh,
                             tempLow: r.tempLow,
                             rssiHigh: r.rssiHigh,
-                            rssiLow: r.rssiLowNoDish,
+                            rssiLow: r.rssiLow,
                             rssiHighNoDish: r.rssiHighNoDish,
                             rssiLowNoDIsh: r.rssiLowNoDish,
                             readingCount: r.readingCount
