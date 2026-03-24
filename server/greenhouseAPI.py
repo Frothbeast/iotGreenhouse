@@ -24,8 +24,8 @@ CL1P_TOKEN = os.getenv('CL1P_TOKEN')
 CL1P_URL = os.getenv('CL1P_URL')
 LOCATION = os.getenv('LOCATION')
 
-GREEN_USER = os.getenv('GREEN_DB_USER')
-GREEN_PASS = os.getenv('GREEN_DB_PASS')
+GREEN_USER = os.getenv('DB_USER')
+GREEN_PASS = os.getenv('PASS')
 DB_HOST = os.getenv('DB_HOST')
 DB_NAME = os.getenv('DB_NAME')
 
