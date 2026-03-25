@@ -24,18 +24,18 @@ CL1P_TOKEN = os.getenv('CL1P_TOKEN')
 CL1P_URL = os.getenv('CL1P_URL')
 LOCATION = os.getenv('LOCATION')
 
-GREEN_USER = os.getenv('DB_USER')
-GREEN_PASS = os.getenv('PASS')
+DB_USER = os.getenv('DB_USER')
+DB_PASS = os.getenv('DB_PASS')
 DB_HOST = os.getenv('DB_HOST')
 DB_NAME = os.getenv('DB_NAME')
 
-if not GREEN_USER or not GREEN_PASS:
-    sys.stderr.write(f"ERROR: Environment Variables Missing! User: {GREEN_USER}, Pass: {'SET' if GREEN_PASS else 'MISSING'}\n")
+if not DB_USER or not DB_PASS:
+    sys.stderr.write(f"ERROR: Environment Variables Missing! User: {DB_USER}, Pass: {'SET' if DB_PASS else 'MISSING'}\n")
 
 db_config = {
     'host': DB_HOST,
-    'user': GREEN_USER,
-    'password': GREEN_PASS,
+    'user': DB_USER,
+    'password': DB_PASS,
     'database': DB_NAME
 }
 
