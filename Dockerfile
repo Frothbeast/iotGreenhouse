@@ -3,18 +3,13 @@ FROM python:3.10-slim
 RUN apt-get update && apt-get install -y nodejs npm build-essential && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-<<<<<<< HEAD
+
 ARG REACT_APP_GREEN_API_URL
 ENV REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
-=======
 
 COPY database/schema.sh ./database/schema.sh
 RUN chmod +x ./database/schema.sh
 
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main
 COPY client/package*.json ./client/
 RUN cd client && npm install
 
