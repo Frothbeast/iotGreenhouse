@@ -8,8 +8,8 @@ COPY client/package*.json ./client/
 RUN cd client && npm install
 
 COPY client/ ./client/
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ARG REACT_APP_GREEN_API_URL
+ENV REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
 RUN cd client && npm run build
 
 COPY server/requirements.txt .
