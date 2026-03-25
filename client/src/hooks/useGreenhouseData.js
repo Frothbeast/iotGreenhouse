@@ -8,7 +8,7 @@ export function useGreenhouseData(hours) {
         let interval;
 
         const fetchData = () => {
-            fetch(`${API_BASE_URL}/api/greenhouseData?hours=${hours}`)
+            fetch(`${REACT_APP_GREEN_API_URL}/api/greenhouseData?hours=${hours}`)
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data)) {
