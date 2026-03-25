@@ -42,8 +42,9 @@ services:
       - iot-network
 
 networks:
-  iot_network:
-    external: true
+  iot-network:
+    driver: bridge
+    name: iot-network
 
 volumes:
   greenhouse_db_data:
