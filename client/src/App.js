@@ -34,7 +34,7 @@ function App() {
   };
 
   const updateTime = () => {
-    fetch('${process.env.REACT_APP_GREEN_API_URL}/api/time')
+    fetch(`${process.env.REACT_APP_GREEN_API_URL}/api/time`)
       .then(res => res.json())
       .then(data => setServerTime(data.time))
       .catch(err => console.error("Time fetch failed", err));
