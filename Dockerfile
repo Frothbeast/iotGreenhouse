@@ -4,6 +4,9 @@ RUN apt-get update && apt-get install -y nodejs npm build-essential && rm -rf /v
 
 WORKDIR /app
 
+COPY database/schema.sh ./database/schema.sh
+RUN chmod +x ./database/schema.sh
+
 COPY client/package*.json ./client/
 RUN cd client && npm install
 
