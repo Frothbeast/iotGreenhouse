@@ -20,7 +20,7 @@ services:
     build: 
       context: .
       args:
-      - REACT_APP_API_URL=${REACT_APP_GREEN_API_URL}
+      - REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
     environment:
       - TZ=America/Toronto
       - API_PORT=${API_PORT}
