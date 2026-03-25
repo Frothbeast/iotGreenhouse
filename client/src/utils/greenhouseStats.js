@@ -18,6 +18,7 @@ export const calculateColumnStats  = (greenRecords) => {
 
   const lastRecord = greenRecords[0];
   const dateObj = new Date(lastRecord.datetime);
+  const lastTemp = ((lastRecord.tempHigh + lastRecord.tempLow)/2).toFixed(1)
 
   return {
     tempHigh: {avg: StatsLib.avg(tempHighs).toFixed(1),max: StatsLib.max(tempHighs).toFixed(1),min: StatsLib.min(tempHighs).toFixed(1)},
@@ -31,6 +32,6 @@ export const calculateColumnStats  = (greenRecords) => {
     lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     lastDate: dateObj.toLocaleDateString(),
     lastCount: lastRecord.readingCount,
-    lastTemp: (lastRecord.tempHigh + lastRecord.tempLow)/2
+    lastTemp: lastTemp
   };
 };
