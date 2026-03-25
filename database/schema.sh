@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mysql -u root -p"${DB_ROOT_PASSWORD}" <<-EOSQL
+mysql -u root -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
     CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
     USE \`${DB_NAME}\`;
 
