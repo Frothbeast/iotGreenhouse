@@ -3,6 +3,7 @@ FROM python:3.10-slim
 RUN apt-get update && apt-get install -y nodejs npm build-essential && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ARG PUBLIC_URL
 
 ARG REACT_APP_GREEN_API_URL
 ENV REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
@@ -24,8 +25,8 @@ COPY server/ .
 
 RUN mkdir -p /app/client/build && cp -r /app/client/build/* /app/client/build/ || true
 
-ARG API_PORT=5000
-ARG COLLECTOR_PORT=1884
+ARG API_PORT
+ARG COLLECTOR_PORT
 ENV API_PORT=${API_PORT}
 ENV COLLECTOR_PORT=${COLLECTOR_PORT}
 
