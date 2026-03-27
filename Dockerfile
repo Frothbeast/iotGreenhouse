@@ -3,6 +3,7 @@ FROM python:3.10-slim
 RUN apt-get update && apt-get install -y nodejs npm build-essential && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ARG PUBLIC_URL
 
 ARG REACT_APP_GREEN_API_URL
 ENV REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
