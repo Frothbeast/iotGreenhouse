@@ -3,7 +3,7 @@
 #include <DallasTemperature.h>
 #include "config.h"
 
-// --- Configuration --- 
+// --- Configuration ---
 #define ONE_WIRE_BUS 2 
  
 
