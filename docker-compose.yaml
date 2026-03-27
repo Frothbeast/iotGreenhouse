@@ -25,6 +25,7 @@ services:
     build: 
       context: .
       args:
+      - PUBLIC_URL=/  # Forces standalone to look at the root
       - REACT_APP_GREEN_API_URL=${REACT_APP_GREEN_API_URL}
     environment:
       - TZ=America/Toronto
