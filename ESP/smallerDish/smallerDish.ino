@@ -4,7 +4,6 @@
 #include "config.h"
 
 // --- Configuration ---
-const char* DEVICE_ID = "DISH_UNIT"; 
 #define ONE_WIRE_BUS 2 
  
 
