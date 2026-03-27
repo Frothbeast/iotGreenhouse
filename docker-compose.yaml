@@ -17,7 +17,7 @@ services:
       permission_fixer:
         condition: service_completed_successfully
     volumes:
-      - db_data:/var/lib/mysql
+      - greenhouse_db_data:/var/lib/mysql
       - ./database/schema.sh:/docker-entrypoint-initdb.d/01-init-db.sh
     networks:
       - iot-network
