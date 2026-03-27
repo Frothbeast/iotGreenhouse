@@ -25,8 +25,8 @@ COPY server/ .
 
 RUN mkdir -p /app/client/build && cp -r /app/client/build/* /app/client/build/ || true
 
-ARG API_PORT=5000
-ARG COLLECTOR_PORT=1884
+ARG API_PORT
+ARG COLLECTOR_PORT
 ENV API_PORT=${API_PORT}
 ENV COLLECTOR_PORT=${COLLECTOR_PORT}
 
