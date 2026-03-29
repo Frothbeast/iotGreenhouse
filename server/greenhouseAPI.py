@@ -109,13 +109,13 @@ def get_data():
             (SELECT rssiHigh 
              FROM greenhouseData 
              WHERE esp_ID = 'RSSI_MONITOR_01' 
-             AND datetime BETWEEN g1.datetime - INTERVAL 5 MINUTE AND g1.datetime + INTERVAL 5 MINUTE
+             AND datetime BETWEEN g1.datetime - INTERVAL 10 MINUTE AND g1.datetime
              ORDER BY ABS(TIMESTAMPDIFF(SECOND, datetime, g1.datetime)) ASC 
              LIMIT 1) AS rssiHighNoDish,
             (SELECT rssiLow 
              FROM greenhouseData 
              WHERE esp_ID = 'RSSI_MONITOR_01' 
-             AND datetime BETWEEN g1.datetime - INTERVAL 5 MINUTE AND g1.datetime + INTERVAL 5 MINUTE
+             AND datetime BETWEEN g1.datetime - INTERVAL 10 MINUTE AND g1.datetime
              ORDER BY ABS(TIMESTAMPDIFF(SECOND, datetime, g1.datetime)) ASC 
              LIMIT 1) AS rssiLowNoDish
         FROM greenhouseData g1
