@@ -16,7 +16,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                         <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiLow dB</th>
                         <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiHigh NoDish dB</th>
                         <th className="greenhouseTableHeaderCellRow1 smaller stack-text">rssiLow NoDish dB</th>
-                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">Reading Counts</th>
+                        <th className="greenhouseTableHeaderCellRow1 smaller stack-text">Count Diff</th>
                     </tr>
                     <tr className="greenhouseTableHeaderRow2">
                         <th className="greenhouseTableHeaderCell1Row2 smaller">MAX</th>

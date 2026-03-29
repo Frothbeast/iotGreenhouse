@@ -104,7 +104,12 @@ def get_data():
             g1.tempLow, 
             g1.rssiHigh, 
             g1.rssiLow, 
-            g1.readingCount, 
+            g1.readingCount - IFNULL((SELECT readingCount 
+                FROM greenhouseData 
+                WHERE esp_ID = 'RSSI_MONITOR_01' 
+                AND datetime BETWEEN g1.datetime - INTERVAL 10 MINUTE AND g1.datetime
+                ORDER BY ABS(TIMESTAMPDIFF(SECOND, datetime, g1.datetime)) ASC 
+                LIMIT 1), 0) AS readingCount, 
             g1.notes,
             (SELECT rssiHigh 
              FROM greenhouseData 
