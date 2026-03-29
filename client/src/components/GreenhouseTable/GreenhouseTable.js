@@ -54,7 +54,7 @@ const GreenhouseTable = ({ records = [], columnStats }) => {
                     {Array.isArray(records) && records.map((record) => (
                         <tr key={record.id} className="greenhouseTableRow">
                             <td className="greenhouseTableCell2">
-                                {record.datetime ? record.datetime.split(/[ T]/)[1].substring(0, 5) : "N/a"}
+                                {record.datetime ? new Date(record.datetime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) : "N/a"}
                             </td>
                             <td className="greenhouseTableCell">{record.tempHigh ?? "N/a"}</td>
                             <td className="greenhouseTableCell">{record.tempLow ?? "N/a"}</td>

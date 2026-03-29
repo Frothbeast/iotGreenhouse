@@ -41,7 +41,7 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
           <span className="unit">°C</span>
         </div>
         <div className="lastCount">
-          <span className="label">Last Counts</span>
+          <span className="label">Count Delta</span>
           <span className="value">{columnStats?.lastCount ?? "N/a"}</span>
           <span className="unit">Counts/10 min</span>
         </div>

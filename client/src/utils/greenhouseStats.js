@@ -29,7 +29,7 @@ export const calculateColumnStats  = (greenRecords) => {
     rssiLowNoDish: {avg: StatsLib.avg(rssiLowNoDishs).toFixed(1),max: StatsLib.max(rssiLowNoDishs).toFixed(1),min: StatsLib.min(rssiLowNoDishs).toFixed(1)},
     readingCount: {avg: StatsLib.avg(readingCounts).toFixed(1),max: StatsLib.max(readingCounts).toFixed(1),min: StatsLib.min(readingCounts).toFixed(1)},
 
-    lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+    lastTime: dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }),
     lastDate: dateObj.toLocaleDateString(),
     lastCount: lastRecord.readingCount,
     lastTemp: lastTemp
