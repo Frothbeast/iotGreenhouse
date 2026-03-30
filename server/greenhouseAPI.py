@@ -10,6 +10,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import sys
 from decimal import Decimal
+import pytz
 
 static_dir = os.environ.get('STATIC_FOLDER', '/app/client/build')
 
@@ -147,7 +148,9 @@ def get_data():
 
 @app.route('/api/time', methods=['GET'])
 def get_time():
-    return jsonify({"time": datetime.now().strftime("%I:%M %p")})
+    ontario_tz = pytz.timezone('America/Toronto')
+    now_ontario = datetime.now(ontario_tz)
+    return jsonify({"time": now_ontario.strftime("%I:%M %p")})
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
