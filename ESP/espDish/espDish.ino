@@ -3,18 +3,17 @@
 #include <DallasTemperature.h>
 #include "config.h"
 
-// --- Configuration --- 
 #define ONE_WIRE_BUS 2 
- 
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-// Fixed-size buffers
 char rawBuffer[128];
 char hexBuffer[256];
 
-// --- Optimized Hex Converter ---
+unsigned long lastMeasureTime = 0;
+const unsigned long measureInterval = 10000;
+
 void toHex(const char* input, char* output) {
     const char* hexChars = "0123456789abcdef";
     while (*input) {
@@ -29,73 +28,56 @@ void setup() {
     Serial.begin(115200);
     sensors.begin();
     
-    // Standard blocking mode is safer for timing-sensitive reads
-    sensors.setWaitForConversion(true); 
+    sensors.setResolution(9);
+    sensors.setWaitForConversion(false);
     
+    WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500); 
-        Serial.print(".");
-    }
-    Serial.println("\nConnected.");
+    Serial.println("WiFi Connecting...");
 }
 
 void loop() {
-    ESP.wdtFeed();
+    yield(); 
 
-    if (WiFi.status() == WL_CONNECTED) {
-        // 1. Request Temperature (750ms internal delay for 12-bit)
-        sensors.requestTemperatures(); 
+    if (millis() - lastMeasureTime >= measureInterval) {
+        lastMeasureTime = millis();
+
+        if (WiFi.status() != WL_CONNECTED) {
+            Serial.println("WiFi not connected. Retrying next cycle...");
+            return; 
+        }
+        sensors.requestTemperatures();
         
-        // 2. Read with Interrupt Protection and Retry Logic
-        float tempC = -127.00;
-        for (int i = 0; i < 3; i++) {
-            // Disable interrupts to prevent WiFi stack from stealing CPU cycles during bit-banging
-            noInterrupts(); 
-            tempC = sensors.getTempCByIndex(0);
-            interrupts(); 
-            
-            // If reading is valid, break out of retry loop
-            if (tempC != -127.00 && tempC != 85.00) {
-                break;
-            }
-            delay(100); // Short breather before next attempt
+        delay(100); 
+
+        float tempC = sensors.getTempCByIndex(0);
+
+        if (tempC == -127.00 || tempC == 85.00) {
+            Serial.println("Sensor Error: Reading discarded.");
+            return;
         }
 
-        // 3. Only transmit if we have a valid reading
-        if (tempC != -127.00 && tempC != 85.00) {
-            WiFiClient client;
+        WiFiClient client;
+        client.setTimeout(2000);
 
-            if (client.connect(SERVER_IP, SERVER_PORT)) { 
-                int rssi = WiFi.RSSI();
+        if (client.connect(SERVER_IP, SERVER_PORT)) {
+            int rssi = WiFi.RSSI();
+            snprintf(rawBuffer, sizeof(rawBuffer), "id=%s&temp=%.2f&rssi=%d", DEVICE_ID, tempC, rssi);
+            toHex(rawBuffer, hexBuffer);
 
-                // 4. Format and Encode
-                snprintf(rawBuffer, sizeof(rawBuffer), "id=%s&temp=%.2f&rssi=%d", DEVICE_ID, tempC, rssi);
-                toHex(rawBuffer, hexBuffer);
-
-                // 5. Send Only Hex ASCII
-                client.print(hexBuffer); 
-                
-                // 6. Wait for ACK from Python
-                unsigned long timeout = millis();
-                while (client.available() == 0 && millis() - timeout < 2000) {
-                    yield();
-                }
-                
-                if (client.available()) {
-                    String response = client.readStringUntil('\n');
-                    Serial.println("Server ACK: " + response);
-                }
-
-                client.stop();
-            } else {
-                Serial.println("Connection to Collector failed.");
+            client.print(hexBuffer);
+            unsigned long startWait = millis();
+            while (client.connected() && !client.available() && (millis() - startWait < 1500)) {
+                yield();
             }
+
+            if (client.available()) {
+                String response = client.readStringUntil('\n');
+                Serial.println("ACK: " + response);
+            }
+            client.stop();
         } else {
-            Serial.println("Sensor Read Error: Skipping this cycle.");
+            Serial.println("Server connection failed.");
         }
     }
-    
-    // 10-second polling interval
-    delay(10000); 
 }
