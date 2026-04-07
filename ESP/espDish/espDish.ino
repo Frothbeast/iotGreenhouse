@@ -61,7 +61,7 @@ void loop() {
                 snprintf(rawBuffer, sizeof(rawBuffer), "id=%s&temp=%.2f&rssi=%d", DEVICE_ID, tempC, rssi);
                 toHex(rawBuffer, hexBuffer);
 
-                client.print(hexBuffer);
+                client.println(hexBuffer);
                 
                 unsigned long startWait = millis();
                 while (client.connected() && !client.available() && (millis() - startWait < 1500)) {
