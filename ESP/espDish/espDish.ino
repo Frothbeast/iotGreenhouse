@@ -54,7 +54,7 @@ void loop() {
 
         if (tempC == -127.00 || tempC == 85.00) {
             tempC = -128.00; 
-            Serial.println("Sensor Error: Reporting -999 to server.");
+            Serial.println("Sensor Error: Reporting -128 to server.");
         }
 
         WiFiClient client;
@@ -71,10 +71,16 @@ void loop() {
                 yield();
             }
 
-            if (client.available()) {
-                String response = client.readStringUntil('\n');
-                Serial.println("ACK: " + response);
+            String response = "";
+            unsigned long startRead = millis();
+            while (client.connected() && (millis() - startRead < 1000)) { // 1s max read time
+                while (client.available()) {
+                    char c = client.read();
+                    if (c == '\n') break; 
+                    response += c;
+                }
             }
+            if (response.length() > 0) Serial.println("ACK: " + response);
             client.stop();
         } else {
             Serial.println("Server connection failed.");
