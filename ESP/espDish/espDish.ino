@@ -53,8 +53,8 @@ void loop() {
         float tempC = sensors.getTempCByIndex(0);
 
         if (tempC == -127.00 || tempC == 85.00) {
-            Serial.println("Sensor Error: Reading discarded.");
-            return;
+            tempC = -128.00; 
+            Serial.println("Sensor Error: Reporting -999 to server.");
         }
 
         WiFiClient client;
