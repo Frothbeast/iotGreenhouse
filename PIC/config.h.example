@@ -1,0 +1,9 @@
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// Server Connection Settings
+#define SERVER_IP   "xxx.xxx.xxx.xxx"
+#define SERVER_PORT "xxxx"
+
+#endif // CONFIG_H
