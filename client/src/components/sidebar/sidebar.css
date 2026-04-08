@@ -30,8 +30,8 @@
 }
 
 .sidebar .chartContainer {
-  flex: 0 0 50%;
-  height: 50%;
+  flex: 0 0 100%; 
+  width: 100%;
   position: relative;
   box-sizing: border-box;
   border: 2px solid black;
@@ -47,9 +47,9 @@
  @container sidebarArea (max-width: 600px) {
   .sidebar [class^="chartContainer"] {
     flex-basis: 100%;
-    height: 33.33%; 
+    height: 50%; 
   }
   #tempChart {
-  height: 33.33%;
+  height: 50%;
 }
 }
