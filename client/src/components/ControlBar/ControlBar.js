@@ -93,17 +93,8 @@ const ControlBar = ({ cl1pClick, selectedHours, onHoursChange, columnStats, reco
                 label: "Low RSSI",
                 color: "cyan",
                 data: records.map(r => r.rssiLow)
-              }
-            ]}
-            options={getOptions(-100, 0)}
-          />
-        </div>
-                <div className="chartContainer">
-          <div className="chartWatermark">RSSI NO DISH</div>
-          <GreenhouseChart
-            labels={records.map((_, i) => i)}
-            datasets={[
-              {
+              },
+                            {
                 label: "High RSSI No Dish",
                 color: "cyan",
                 data: records.map(r => r.rssiHighNoDish)
