@@ -28,7 +28,7 @@ void setup() {
     Serial.begin(115200);
     sensors.begin();
     sensors.setResolution(9);
-    sensors.setWaitForConversion(false);
+    sensors.setWaitForConversion(true);
     
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -41,7 +41,7 @@ void loop() {
         lastMeasureTime = millis();
 
         sensors.requestTemperatures();
-        delay(100); 
+
         float tempC = sensors.getTempCByIndex(0);
 
         if (tempC == -127.00 || tempC == 85.00) {
