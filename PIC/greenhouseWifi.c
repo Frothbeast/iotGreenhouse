@@ -29,32 +29,48 @@
 #define _XTAL_FREQ 20000000
 
 // Hardware Mapping
-#define light_SSR          LATC0          // solid state relay for grow light
-#define TRISlight          TRISC0         // solid state relay for grow light
-#define fanSSR             LATB0          // solid state relay for fan
-#define TRISfan            TRISB0         // solid state relay for fan
-#define coolSSR            LATC1          // solid state relay for cooling
-#define TRIScool           TRISC1         // solid state relay for cooling
-#define heatSSR            LATC2          // solid state relay for heat  
-#define TRISheat           TRISC2         // solid state relay for heat
+#define light_SSR          LATCbits.LATC0          // solid state relay for grow light
+#define TRISlight          TRISC0                  // solid state relay for grow light
+#define fanSSR             LATCbits.LATC1          // solid state relay for fan
+#define TRISfan            TRISC1                  // solid state relay for fan
+#define coolSSR            LATCbits.LATC2          // solid state relay for cooling
+#define TRIScool           TRISC2                  // solid state relay for cooling
+#define heatSSR            LATCbits.LATC3          // solid state relay for heat  
+#define TRISheat           TRISC3                  // solid state relay for heat
+
+#define Display_pin        LATCbits.LATC4  
+#define TRIS_Display       TRISC4          
+
+#define sunlight           PORTAbits.RA0 
+#define TRIS_sunlight      TRISA0         // photresistor 5V on one side and this pin with 10k pulldown on other side
+#define thermistor1        PORTAbits.RA1 
+#define TRIS_thermistor1   TRISA1         
+#define thermistor2        PORTAbits.RA2 
+#define TRIS_thermistor2   TRISA2         
+#define thermistor3        PORTAbits.RA3 
+#define TRIS_thermistor3   TRISA3
+
+#define column1            PORTBbits.RB4 // input columns for keypad
+#define TRIS_column1       TRISB4        // 1 2 3 
+#define column2            PORTBbits.RB5 // 4 5 6
+#define TRIS_column2       TRISB5        // 7 8 9     
+#define column3            PORTBbits.RB6 // * 0 #
+#define TRIS_column3       TRISB6                                                 
+#define row1               LATBbits.LATB0// output rows for keypad
+#define TRIS_row1          TRISB0          
+#define row2               LATBbits.LATB1// output rows for keypad
+#define TRIS_row2          TRISB1         
+#define row3               LATBbits.LATB2// output rows for keypad
+#define TRIS_row3          TRISB2         
+#define row4               LATBbits.LATB3// output rows for keypad
+#define TRIS_row4          TRISB3
 
 
-#define Display_Pin        LATBbits.LATB4  
-#define TRIS_Display       TRISB4          
-#define thermistorIn       PIN_a3         
-#define thermistorOut      PIN_a4         
-#define thermistorbox      PIN_a2 
-//#define dans_SPI_clock_pin PIN_c3
-//#define dans_SPI_data_pin  PIN_c4
-#define column1            PIN_b6         // 3 columns for keypad
-#define column2            PIN_b7         // 1 2 3
-#define column3            PIN_b2         // 4 5 6                                        
-#define row1               PIN_c7         // 7 8 9     
-#define row2               PIN_c5         // * 0 #
-#define row3               PIN_a5         // 4 rows for keypad
-#define row4               PIN_b5
-#define sunlight_pin       pin_a0      // photresistor 5V on one side and this pin with 10k pulldown on other side
-#define one_wire_pin       pin_a1      // one wire temp or other
+ADCON1 = 0x0B;                            // AN0 through AN3 are Analog 
+INTCONbits.RBIE = 1;                      // Enable Port B change interrupt
+TRISB4 = 1;                               // Column 1 Input
+TRISB5 = 1;                               // Column 2 Input
+TRISB6 = 1;                               // Column 3 Input
 
 // Circular Buffer for Display
 #define DISP_BUF_SIZE 255
@@ -67,18 +83,37 @@ uint16_t displayDelayCounter = 0;
 
 // Application Variables
 volatile char error_msg[5] = " OK";
-uint8_t wasOn = 0, wasOff = 0, triggerSecondCount = 0;
-uint8_t highLevelStatus, lowLevelStatus, timeToDisplay = 0;
+uint8_t triggerSecondCount = 0;
+uint8_t timeToDisplay = 0;
 uint32_t secondsSincePowerup = 0;
-uint16_t hoursSincePowerup = 0, currentOnTime = 0, currentOffTime = 0, secondsCounter = 0, duty = 50;
-uint16_t lastOnTime = 0, lastOffTime = 0, espFails;
+uint16_t hoursSincePowerup = 0, secondsCounter = 0;
+uint16_t espFails;
 uint8_t pumpState = 0; 
 uint8_t initialSendDone = 0;
-uint16_t lowSampleCount = 0, highSampleCount = 0;
 uint16_t tenMinuteCounter = 0;
 uint8_t tenMinuteFlag = 0;
 uint16_t backlightTime = 0;
 uint8_t backlightState = 1;
+
+float heat_duty = 0, cool_duty = 0;
+uint8_t suspend_heat_active = 1;
+
+uint8_t MODcoldPID = 1;
+
+//PID struct
+typedef struct {
+    float Kp, Ki, Kd;
+    float integral;
+    float prev_error;
+} pid_params_t;
+
+//EEPROM locations
+#define EE_HEAT_KP    40  // 40-43
+#define EE_HEAT_KI    44  // 44-47
+#define EE_HEAT_KD    48  // 48-51
+#define EE_COOL_KP    52  // 52-55
+#define EE_COOL_KI    56  // 56-59
+#define EE_COOL_KD    60  // 60-63
 
 // Raw and Filtered ADC values
 uint16_t low_val = 0, high_val = 0;
@@ -89,14 +124,15 @@ uint32_t lowSum = 0, highSum = 0;
 uint16_t lastLatod = 0, lastHatod = 0;
 
 // --- NEW DATA BUFFERING LOGIC ---
-#define MAX_RECORDS 10
 typedef struct {
-    uint16_t h_adc;
-    uint16_t l_adc;
-    uint16_t hrs;
-    uint16_t on_t;
-    uint16_t off_t;
-} pump_record_t;
+    uint16_t inside_temp;   // thermistor1 (RA1)
+    uint16_t outside_temp;  // thermistor2 (RA2)
+    uint16_t box_temp;      // thermistor3 (RA3)
+    uint16_t light_level;   // sunlight (RA0)
+    uint8_t  ssr_states;    // Bitmask: bit0=Heat, bit1=Cool, bit2=Fan, bit3=Light
+} greenhouse_record_t;
+
+greenhouse_record_t record_buffer[MAX_RECORDS];
 
 pump_record_t record_buffer[MAX_RECORDS];
 uint8_t buf_head = 0; 
@@ -133,6 +169,10 @@ volatile uint8_t rx_idx = 0;
 //*********************** Routines or functions ********************************
 /////////////////////////////////////////////////////////////////////////////////
 // Function Prototypes
+void load_pid_settings(void)
+void eeprom_write_float(uint16_t addr, float value)
+float eeprom_read_float(uint16_t addr)
+void calculate_control_logic(int8_t current_temp)
 void put_to_disp_buf(const char* str);
 void process_display_buffer(void);
 int8_t updateDisplayCoord(uint8_t line, uint8_t column, const char* str);
@@ -140,6 +180,42 @@ void software_putch(char data);
 void uart_send_string(const char* s);
 void process_esp_state_machine(void);
 uint16_t read_adc(uint8_t channel);
+
+void load_pid_settings(void) {
+    if (eeprom_read(EE_HEAT_KP) == 0xFF) {
+        heat_pid.Kp = 1.0; heat_pid.Ki = 0.1; heat_pid.Kd = 0.05;
+        cool_pid.Kp = 1.0; cool_pid.Ki = 0.1; cool_pid.Kd = 0.05;
+        save_all_pid_settings();
+    } else {
+        heat_pid.Kp = eeprom_read_float(EE_HEAT_KP);
+        heat_pid.Ki = eeprom_read_float(EE_HEAT_KI);
+        heat_pid.Kd = eeprom_read_float(EE_HEAT_KD);
+        cool_pid.Kp = eeprom_read_float(EE_COOL_KP);
+        cool_pid.Ki = eeprom_read_float(EE_COOL_KI);
+        cool_pid.Kd = eeprom_read_float(EE_COOL_KD);
+    }
+}
+
+void eeprom_write_float(uint16_t addr, float value) {
+    uint8_t *ptr = (uint8_t *)&value;
+    for (uint8_t i = 0; i < 4; i++) {
+        eeprom_write(addr + i, ptr[i]);
+    }
+}
+
+float eeprom_read_float(uint16_t addr) {
+    float value;
+    uint8_t *ptr = (uint8_t *)&value;
+    for (uint8_t i = 0; i < 4; i++) {
+        ptr[i] = eeprom_read(addr + i);
+    }
+    return value;
+}
+
+void calculate_control_logic(int8_t current_temp) {
+    if (suspend_heat_active && (cool_duty > 0 || coolSSR == 1)) {heat_duty = 0;heatSSR = 0; }
+    // PID calculations would update heat_duty and cool_duty here
+}
 
 // interrupt routines
 void __interrupt() v_isr(void) {
@@ -362,17 +438,17 @@ void main(void) {
     SENSOR_PWR = 1;
 
     while (1) {
-        process_display_buffer(); 
+         process_display_buffer(); 
 
-        low_val = read_adc(0);
-        high_val = read_adc(1);
-        low_filtered = (uint16_t)((low_val >> 3) + (low_filtered - (low_filtered >> 3)));
-        high_filtered = (uint16_t)((high_val >> 3) + (high_filtered - (high_filtered >> 3)));
+         low_val = read_adc(0);   
+         high_val = read_adc(1);
+         low_filtered = (uint16_t)((low_val >> 3) + (low_filtered - (low_filtered >> 3)));
+         high_filtered = (uint16_t)((high_val >> 3) + (high_filtered - (high_filtered >> 3)));
 
-        lowLevelStatus = (low_filtered < 900) ? 1 : 0;
-        highLevelStatus = (high_filtered < 900) ? 1 : 0;
+         lowLevelStatus = (low_filtered < 900) ? 1 : 0;
+         highLevelStatus = (high_filtered < 900) ? 1 : 0;
         
-        if (highLevelStatus) { 
+         if (highLevelStatus) { 
             if (pumpState == 0) {
                 uint32_t rapidSum = 0;
                 for(uint8_t i = 0; i < 10; i++) {
@@ -381,8 +457,8 @@ void main(void) {
                 lastHatod = (uint16_t)(rapidSum / 10);        
                 SSR_out = 1; pumpState = 1; 
             }
-        }
-        else if (!lowLevelStatus && !highLevelStatus) { 
+         }
+         else if (!lowLevelStatus && !highLevelStatus) { 
             SSR_out = 0; 
             if (pumpState == 1) { 
                 if (lowSampleCount > 0) lastLatod = (uint16_t)(lowSum / lowSampleCount);
@@ -398,12 +474,18 @@ void main(void) {
                 }
             }
             pumpState = 0; 
-        }
+         }
 
-        if (triggerSecondCount) {
+         if (triggerSecondCount) {
             triggerSecondCount = 0;
             timeToDisplay = 1;
             secondsSincePowerup++;
+            tenMinuteCounter++;
+            
+            if (tenMinuteCounter >= 600) { 
+               if (currentEspState == ESP_IDLE) {save_greenhouse_data();tenMinuteCounter = 0;}
+            }
+            
             if (secondsSincePowerup == 10 && !initialSendDone) {
                 if (lowSampleCount > 0) lastLatod = (uint16_t)(lowSum / lowSampleCount);
                 if (highSampleCount > 0) lastHatod = (uint16_t)(highSum / highSampleCount);
@@ -444,9 +526,9 @@ void main(void) {
                 tenMinuteCounter = 0; tenMinuteFlag = 0;
             }
             if (secondsSincePowerup % 3600 == 0) hoursSincePowerup++;
-        }
+         }
 
-        if (timeToDisplay) {
+         if (timeToDisplay) {
             char line1[21], line2[21], line3[21], line4[21];
             sprintf(line1, "L:%04u H:%04u %s %02d", low_val, high_val, (pumpState) ? "ON " : "OFF", duty);
             sprintf(line2, "On:%04u Off:%04u %s", (pumpState) ? currentOnTime : lastOnTime, (pumpState) ? lastOffTime : currentOffTime, error_msg);
@@ -459,8 +541,16 @@ void main(void) {
             if (pumpState == 1) updateDisplayCoord(4, 1, "Pumping Cycle...    ");
             else updateDisplayCoord(4, 1, line4);
             timeToDisplay = 0;
-        }
-        process_esp_state_machine();
+         }
+
+         if (triggerSecondCount && backlightTime > 0) {
+            backlightTime--;
+            if (backlightTime == 0) {
+               software_putch(15); // Turn off backlight
+               backlightState = 0;
+            }
+         } 
+         process_esp_state_machine();
     }
 }
 
@@ -628,6 +718,10 @@ loop:
    
    if(key!=13)
    {
+      backlightState = 1;
+      backlightTime = 600; 
+      software_putch(14);
+
       switch(mode) //  depending on mode, choose mode or enter value in a string
       {
          case control_mode:// controlling greenhouse in auto
@@ -866,19 +960,23 @@ void time_to_display()
       sprintf(line1,"Temp:%03u.%02lu CONTROL ",onboard_temp,onboard_temp_eighth_value);
       sprintf(line2," Out:%03u.%02lu OFF     ",extra_temp_2,extra_temp_2_eighth_value);
        break;
-   case historical_data_mode:// display saved memory
-      sprintf(line1,"P%03lu E%03lu -1-  +3+",temporary_data_pointer,make16(read_eeprom(stored_index_location_high),read_eeprom(stored_index_location_low)));
-      sprintf(line2,"T:%03u O:%03u A:%03u ",stored_temp,stored_extra_temp_1,stored_extra_temp_2);
-      if(!confirm_erase) sprintf(line3,"%s %s 0-Erase ",stored_date_string,stored_time_string);
-      else sprintf(line3,"%s %s 8Confirm",stored_date_string,stored_time_string);
-      sprintf(line4,"%s L:%u %03u ",heat_string[stored_heat_mode],stored_light_on,stored_light_value);
-     time_to_display_flag=1;
-      break;
    case setpoint_mode:// display setpoints
       sprintf(line1,"Heat-%03u -1- +3+ ",heat_setpoint);
       sprintf(line2,"cool-%03u -4- +6+ ",cool_setpoint);
       line3=" Done 0 ";
       line4="";
+      break;
+   case pid_setting_mode:// set pid values
+      if(MODcoldPID){
+         sprintf(line1,"cool-%03u -1- +3+ ",cool_pid.Kp);
+         sprintf(line2,"cool-%03u -4- +6+ ",cool_pid.Ki);
+         sprintf(line3,"cool-%03u -7- +9+ ",cool_pid.Kd);
+      } else {
+         sprintf(line1,"heat-%03u -1- +3+ ",heat_pid.Kp);
+         sprintf(line2,"heat-%03u -4- +6+ ",heat_pid.Ki);
+         sprintf(line3,"heat-%03u -7- +9+ ",heat_pid.Kd);
+      }
+      line4="Cool-* Done-0 Heat-#";
       break;
    case program_time_mode: // sync the clock
       sprintf(line1,"  %02u:%02u %s%02u 20%u  ",hour,minute,month_name[month],day,year);
@@ -963,16 +1061,14 @@ int8 get_new_mode(int8 original_mode)
       strcpy(line1, " Setpoint mode      ");
       
       break;
-   case historical_data_mode:
-      strcpy(line1, "View Data Mode      ");
-      temporary_data_pointer=0;
-      get_packet_from_NVRAM();
-      time_to_display_flag=1;
-      break;
-   case program_time_mode:
-      strcpy(line1, "Program Time Mode   ");
-      get_time(); // receive time in binary with a time_string and a date_string
-      time_to_display_flag=1;
+
+   case pid_setting_mode:
+    // ... logic to edit values on screen ...
+      if (key == 0) { 
+         save_all_pid_settings();
+         mode = control_mode; 
+         updateDisplayCoord(1, 1, "Settings Saved!     ");
+      }
       break;
     case manual_output_mode:
       strcpy(line1, " Manual Mode        ");
@@ -1050,46 +1146,5 @@ void startup()
    output_float(cool_SSR);
    output_float(cool_not);
    
-}
-
-
-void get_packet_from_NVRAM()
-{
-   disable_interrupts(global);
-   int8 local_data[number_of_bytes_in_a_record];
-   int8 local_i;
-
-   for(local_i=0;local_i<=number_of_bytes_in_a_record,local_i++;)
-   {
-      i2c_start();                  // initiate i2c
-      I2c_write(0xA0);              // Start WRITE condition for address
-      i2c_write(make8(temporary_data_pointer,1)); // set address to pointer high byte
-      i2c_write(make8(temporary_data_pointer,0));  // set address to pointer low byte
-      i2c_start();                  // initiate
-      I2c_write(0xa1);              // Start a READ condition
-      local_data[local_i]=i2c_read();
-   }
-   i2c_stop(); 
-   delay_ms(20);
- 
-   stored_mode = local_data[0];
-   stored_temp  = local_data[1];
-   stored_extra_temp_1  = local_data[2];
-   stored_extra_temp_2  =  local_data[3];
-   stored_hour =  local_data[4];
-   stored_minute =  local_data[5];
-   stored_day = local_data[6];
-   stored_month =  local_data[7];
-   stored_year =  local_data[8];
-   stored_heat_mode =  local_data[9];
-   stored_light_value = local_data[10];
-   stored_light_on =  local_data[11];
- 
-   // in order to make the string I used binary coded decimal(easier in hex)
-   if(stored_heat_mode>3) stored_heat_mode=3;
-   if(stored_month>11) stored_month=11;
-   sprintf(stored_time_string,"%02x:%02x",bin2bcd(stored_hour),bin2bcd(stored_minute));
-   sprintf(stored_date_string,"%s%02x",month_name[stored_month],bin2bcd(stored_day));
-   return;
 }
 
