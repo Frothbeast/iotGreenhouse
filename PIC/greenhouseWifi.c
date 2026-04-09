@@ -109,7 +109,6 @@ uint16_t backlightTime = 0;
 uint8_t backlightState = 1;
 
 uint8_t keypad_active = 0;    // Flag: 1 means we are currently debouncing
-uint16_t debounce_timer = 0;  // Counter for the 100ms wait
 uint8_t last_key = 13;        // Stores the key found during the first hit
 
 float heat_duty = 0, cool_duty = 0;
@@ -144,6 +143,9 @@ typedef struct {
     int32_t integral;  
     int16_t prev_error;
 } pid_params_int_t;
+
+pid_params_int_t cool_pid;
+pid_params_int_t head_pid;
 
 //EEPROM locations
 #define EE_HEAT_KP    40  // 40-43
@@ -572,7 +574,7 @@ uint8_t check_inputs(void) {
     LATBbits.LATB3 = 0;
     uint8_t dummy = PORTB;
     INTCONbits.RBIF = 0;
-    INTCONbits.RBIE = 1
+    INTCONbits.RBIE = 1;
 
     return found_key;
 }
@@ -613,8 +615,8 @@ void main(void) {
         if (keypad_active && debounce_timer == 0) {
             key = check_inputs();
             if (key != 13) {
-               if (key_pressed == 13) return;
-                if (key_pressed == 10) { // '*'
+               if (key == 13) continue;
+                if (key == 10) { // '*'
                     if (mode == display_only_mode)    mode = setpoint_mode;
                     else if (mode == setpoint_mode)   mode = manual_output_mode;
                     else if (mode == manual_output_mode) mode = control_mode;
@@ -622,34 +624,34 @@ void main(void) {
                     else mode = display_only_mode;
                     
                     software_putch(12); // Clear screen on mode change
-                    return;
+                    continue;
                 }
                 switch(mode) {
                     case setpoint_mode: 
-                        if (key_pressed == 1) heat_setpoint++;
-                        if (key_pressed == 3) heat_setpoint--;
-                        if (key_pressed == 4) cool_setpoint++;
-                        if (key_pressed == 6) cool_setpoint--;
+                        if (key == 1) heat_setpoint++;
+                        if (key == 3) heat_setpoint--;
+                        if (key == 4) cool_setpoint++;
+                        if (key == 6) cool_setpoint--;
                         break;
 
                     case manual_output_mode: 
-                        if (key_pressed == 1) heat_SSR = !heat_SSR;
-                        if (key_pressed == 2) cool_SSR = !cool_SSR;
-                        if (key_pressed == 3) fanSSR = !fanSSR;
-                        if (key_pressed == 4) light_SSR = !light_SSR;
-                        if (key_pressed == 12) mode = control_mode; // '#'
+                        if (key == 1) heat_SSR = !heat_SSR;
+                        if (key == 2) cool_SSR = !cool_SSR;
+                        if (key == 3) fanSSR = !fanSSR;
+                        if (key == 4) light_SSR = !light_SSR;
+                        if (key == 12) mode = control_mode; // '#'
                         break;
 
                     case pid_tuning_mode: 
-                        if (key_pressed == 12) MODcoldPID = !MODcoldPID; // '#' key
-                        if (key_pressed == 0) {
+                        if (key == 12) MODcoldPID = !MODcoldPID; // '#' key
+                        if (key == 0) {
                             save_all_pid_settings(); 
                             strcpy((char*)error_msg, "SAVD");
                         }
                         break;
 
                     case control_mode:
-                    case display_only_mode:.
+                    case display_only_mode:
                         break;
                 }
             
@@ -677,13 +679,6 @@ void main(void) {
             heat_output = calculate_pid_int(&heat_pid, heat_setpoint, inside_temp_filtered);
             cool_output = calculate_pid_int(&cool_pid, cool_setpoint, inside_temp_filtered);
             }
-            if (current_mode == MANUAL_MODE) {
-            if (key == 1) heatSSR = !heatSSR;
-            if (key == 2) coolSSR = !coolSSR;
-            if (key == 3) fanSSR  = !fanSSR;
-            if (key == 4) light_SSR = !light_SSR;
-            } 
-            else {
             if (cool_output > 0 && cool_output <= 50) {
                 coolSSR = (cool_output * 2 > (pwm_timer * 10)) ? 1 : 0;
                 fanSSR = 0; 
@@ -704,10 +699,10 @@ void main(void) {
             } else {
                 light_SSR = 0;
             }
-            }
+            
             tenMinuteCounter++;
             if (tenMinuteCounter >= 600) {
-            save_to_buffer(); 
+            save_to_buffer(inside_temp_filtered, outside_temp_filtered, hoursSincePowerup, heat_output, cool_output); 
             tenMinuteCounter = 0;
             }
         }
