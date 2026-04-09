@@ -95,6 +95,10 @@ uint8_t tenMinuteFlag = 0;
 uint16_t backlightTime = 0;
 uint8_t backlightState = 1;
 
+uint8_t keypad_active = 0;    // Flag: 1 means we are currently debouncing
+uint16_t debounce_timer = 0;  // Counter for the 100ms wait
+uint8_t last_key = 13;        // Stores the key found during the first hit
+
 float heat_duty = 0, cool_duty = 0;
 uint8_t suspend_heat_active = 1;
 
@@ -102,10 +106,10 @@ uint8_t MODcoldPID = 1;
 
 //PID struct
 typedef struct {
-    float Kp, Ki, Kd;
-    float integral;
-    float prev_error;
-} pid_params_t;
+    int16_t Kp, Ki, Kd; 
+    int32_t integral;  
+    int16_t prev_error;
+} pid_params_int_t;
 
 //EEPROM locations
 #define EE_HEAT_KP    40  // 40-43
@@ -133,11 +137,6 @@ typedef struct {
 } greenhouse_record_t;
 
 greenhouse_record_t record_buffer[MAX_RECORDS];
-
-pump_record_t record_buffer[MAX_RECORDS];
-uint8_t buf_head = 0; 
-uint8_t buf_tail = 0; 
-uint8_t records_pending = 0;
 
 void save_to_buffer(uint16_t h, uint16_t l, uint16_t hrs, uint16_t ont, uint16_t offt) {
     if (records_pending < MAX_RECORDS) {
@@ -180,6 +179,27 @@ void software_putch(char data);
 void uart_send_string(const char* s);
 void process_esp_state_machine(void);
 uint16_t read_adc(uint8_t channel);
+int16_t calculate_pid_int(pid_params_int_t *p, int16_t setpoint, int16_t current_val)
+
+int16_t calculate_pid_int(pid_params_int_t *p, int16_t setpoint, int16_t current_val) {
+    int16_t error = setpoint - current_val;
+    
+    p->integral += error;
+    
+    // Anti-windup: Clamp the integral to prevent it from growing too large
+    if (p->integral > 1000) p->integral = 1000;
+    if (p->integral < -1000) p->integral = -1000;
+
+    int16_t derivative = error - p->prev_error;
+    
+    // Result = (P + I + D) / 100
+    int32_t output = ((int32_t)p->Kp * error) + 
+                     ((int32_t)p->Ki * p->integral) + 
+                     ((int32_t)p->Kd * derivative);
+    
+    p->prev_error = error;
+    return (int16_t)(output / 100);
+}
 
 void load_pid_settings(void) {
     if (eeprom_read(EE_HEAT_KP) == 0xFF) {
@@ -219,15 +239,22 @@ void calculate_control_logic(int8_t current_temp) {
 
 // interrupt routines
 void __interrupt() v_isr(void) {
-    if (INTCONbits.TMR0IF) {
-        secondsCounter++;
-        if (secondsCounter >= 9223) { 
-            secondsCounter = 0;
-            triggerSecondCount = 1;
-            if (espTimer > 0) espTimer--; 
-        }
-        INTCONbits.TMR0IF = 0; 
-    }
+   if (INTCONbits.TMR0IF) {
+      secondsCounter++;
+      if (secondsCounter >= 9223) { 
+         secondsCounter = 0;
+         triggerSecondCount = 1;
+         if (espTimer > 0) espTimer--; 
+      }
+      INTCONbits.TMR0IF = 0; 
+   }
+
+   if (INTCONbits.RBIF) {
+      uint8_t discard = PORTB; 
+      keypad_pending = 1;      // Flag indicating a touch was detected
+      INTCONbits.RBIF = 0;
+   }
+
     if (PIR1bits.RCIF) {
         char c = RCREG; 
         if (rx_idx < 63) {
@@ -482,9 +509,20 @@ void main(void) {
             secondsSincePowerup++;
             tenMinuteCounter++;
             
-            if (tenMinuteCounter >= 600) { 
-               if (currentEspState == ESP_IDLE) {save_greenhouse_data();tenMinuteCounter = 0;}
-            }
+         if (tenMinuteCounter >= 600) {
+         if (currentEspState == ESP_IDLE) {
+            record_buffer[buf_head].inside_temp = read_adc(1); 
+            record_buffer[buf_head].outside_temp = read_adc(2);
+            record_buffer[buf_head].box_temp = read_adc(3);
+            record_buffer[buf_head].light_level = read_adc(0);
+            record_buffer[buf_head].ssr_states = (heatSSR) | (coolSSR << 1) | (fanSSR << 2) | (light_SSR << 3);
+
+            buf_head = (buf_head + 1) % MAX_RECORDS;
+            records_pending++;
+            
+            tenMinuteCounter = 0; 
+        }
+    }
             
             if (secondsSincePowerup == 10 && !initialSendDone) {
                 if (lowSampleCount > 0) lastLatod = (uint16_t)(lowSum / lowSampleCount);
@@ -621,43 +659,15 @@ char light_string[4];
 int16 Light_morning_start;
 int16 Light_evening_stop;
 
-/////////////////////////////////////////////////////////////////////////////////
-//****************************    INTERRUPTS     ********************************
-/////////////////////////////////////////////////////////////////////////////////
+time_to_measure_sunlight                  =0 ;
+time_to_display_flag                      =0 ;
+time_to_control                           =0 ;
+startup(); 
 
-#INT_TIMER1
-void  TIMER1_isr(void) 
-{
-   one_second_counter++;
 
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-//****************************     MAIN          ********************************
-/////////////////////////////////////////////////////////////////////////////////
 void main()
 {
    
-   
-/////////////////////////////////////////////////////////////////////////////////
-//****************************     initialize    ********************************
-/////////////////////////////////////////////////////////////////////////////////
-
-   temp                                      =0;                          // temporary temperature
-   onboard_temp                              =0;                  // main temperature
-   extra_temp_1                              =0;                  // auxilliary temperature
-   extra_temp_2                              =0;                  // outdoor temperature 
-   time_to_measure_sunlight                  =0 ;
-   time_to_display_flag                      =0 ;
-   time_to_control                           =0 ;
-   startup(); 
-   
-///////////////////////////////////////////////////////////
-//****************************     Main Loop    ********************************
-/////////////////////////////////////////////////////////////////////////////////
-loop:
-   enable_interrupts(INT_TIMER1);
-   enable_interrupts(GLOBAL);
    restart_wdt();                   // reset countdown to hardware reset
   
    if(light_on)
@@ -670,7 +680,16 @@ loop:
       light_string="OFF";
       output_low(light_SSR);
    }
-   
+
+   if (keypad_pending) {keypad_pending = 0;debounce_timer = 0;keypad_active = 1;}
+
+   if (keypad_active && (ms_counter >= 100)) { 
+      uint8_t confirmed_key = check_inputs();
+      if (confirmed_key != 13) {process_menu(confirmed_key);backlightTime = 600; software_putch(14);}
+      keypad_active = 0;   
+      ms_counter = 0;
+   }
+
    switch(heat_mode)
    {
       case heating:
@@ -703,13 +722,33 @@ loop:
          break;
    }
    
-   if(one_second_counter>=10)       // set lots of flags and variables every second
+   if(one_second_counter>=10)       // set flags and variables every second
    {
       time_to_display_flag=1;
       time_to_control=1;
       time_to_measure_sunlight=1;
 
       one_second_counter=0;
+
+      pwm_timer++;
+      if (pwm_timer == 0) {
+         current_temp = read_thermistor(1);
+         current_light = read_adc(0);
+         heat_output = calculate_pid_int(&heat_pid, heat_setpoint, current_temp, current_light);
+         cool_output = calculate_pid_int(&cool_pid, cool_setpoint, current_temp, current_light);
+      }
+      if (pwm_timer >= 10) pwm_timer = 0; // 10-second window
+
+      if (heat_output > pwm_timer * 10) {
+         heatSSR = 1;
+      } else {
+         heatSSR = 0;
+      }
+      if (cool_output > (pwm_timer * 10)) {
+         coolSSR = 1;
+      } else {
+         coolSSR = 0;
+      }
    }
    
    key=check_inputs();                  // get user inputs from keypad
@@ -935,7 +974,6 @@ loop:
    if(hour>=Light_morning_start && hour<=Light_evening_stop && light_value<50) light_on=1;
 //control everything
 }
-   goto loop;
 
 }
 
@@ -990,34 +1028,38 @@ void time_to_display()
    }
 }
 
-int8 check_inputs()
-{
-   const int8 key_aquire_delay      =   15;//ms
+uint8_t check_inputs(void) {
+    uint8_t found_key = 13; 
+    LATBbits.LATB0 = 0; LATBbits.LATB1 = 1; LATBbits.LATB2 = 1; LATBbits.LATB3 = 1;
+    __delay_us(50);
+    if (!PORTBbits.RB4)      found_key = 1;
+    else if (!PORTBbits.RB5) found_key = 2;
+    else if (!PORTBbits.RB6) found_key = 3;
+    if (found_key != 13) goto finalize_scan;
+    LATBbits.LATB0 = 1; LATBbits.LATB1 = 0; LATBbits.LATB2 = 1; LATBbits.LATB3 = 1;
+    __delay_us(50);
+    if (!PORTBbits.RB4)      found_key = 4;
+    else if (!PORTBbits.RB5) found_key = 5;
+    else if (!PORTBbits.RB6) found_key = 6;
+    if (found_key != 13) goto finalize_scan;
+    LATBbits.LATB0 = 1; LATBbits.LATB1 = 1; LATBbits.LATB2 = 0; LATBbits.LATB3 = 1;
+    __delay_us(50);
+    if (!PORTBbits.RB4)      found_key = 7;
+    else if (!PORTBbits.RB5) found_key = 8;
+    else if (!PORTBbits.RB6) found_key = 9;
+    if (found_key != 13) goto finalize_scan;
+    LATBbits.LATB0 = 1; LATBbits.LATB1 = 1; LATBbits.LATB2 = 1; LATBbits.LATB3 = 0;
+    __delay_us(50);
+    if (!PORTBbits.RB4)      found_key = 10; // *
+    else if (!PORTBbits.RB5) found_key = 0;
+    else if (!PORTBbits.RB6) found_key = 12; // #
 
-   key=13;
-   output_low(column1);
-   delay_ms(key_aquire_delay);
-   if(!input(row1))   Key=1;
-   if(!input(row2))   key=4;
-   if(!input(row3))   key=7;
-   if(!input(row4))   key=10;//*
-   output_float(column1);
-   output_low(column2);
-   delay_ms(key_aquire_delay);
-   if(!input(row1))   Key=2;
-   if(!input(row2))   key=5;
-   if(!input(row3))   key=8;
-   if(!input(row4))   key=0;
-   output_float(column2);
-   output_low(column3);
-   delay_ms(key_aquire_delay);
-   if(!input(row1))   Key=3;
-   if(!input(row2))   key=6;
-   if(!input(row3))   key=9;
-   if(!input(row4))   key=12;//#
-   output_float(column3);
-
-   return key;
+finalize_scan:
+    LATBbits.LATB0 = 0;
+    LATBbits.LATB1 = 0;
+    LATBbits.LATB2 = 0;
+    LATBbits.LATB3 = 0;
+    return found_key;
 }
 
 int8 get_new_mode(int8 original_mode)
@@ -1091,39 +1133,22 @@ int8 get_new_mode(int8 original_mode)
    return mode;
 }
 
-void startup()
-{
-   
-   if(read_eeprom(first_ever_run_location)!=69)
-   {
-   //////////////////////////////////////////////////////////////////////////
-   /////  First ever powerup ////////////////////////////////////////////////
-   //////////////////////////////////////////////////////////////////////////
-      heat_setpoint =15;
-      cool_setpoint =40;
-      write_eeprom(cool_setpoint_location,cool_setpoint);
-      write_eeprom(heat_setpoint_location,heat_setpoint);
-      mode = display_only_mode; // which mode is this program in eg control mode, manual mode, change time stored in NVRAM in case of power fail
-      write_eeprom(stored_mode_location,display_only_mode);
-      store_data_counter=0;
-      tempIn=222;
-      tempOut=222;
-      tempBox=222;
-      heat_mode=nothing;
-      light_value=100;
-      light_on=1;
-   }
-   else
-   {
-   //////////////////////////////////////////////////////////////////////////
-   /////  Regular powerup ///////////////////////////////////////////////////
-   //////////////////////////////////////////////////////////////////////////
-   
-      heat_setpoint =read_eeprom(heat_setpoint_location);
-      cool_setpoint =read_eeprom(cool_setpoint_location);
-      recording_on_flag= read_eeprom(recording_on_location);
-      mode =read_eeprom(stored_mode_location); // which mode is this program in eg control mode, manual mode, change time stored in NVRAM in case of power fail
-   }
+void startup(void) {
+    ADCON1 = 0x0B;  // AN0-AN3 Analog, others Digital
+    ADCON2 = 0x92;  // Right justify, 4 TAD, Fosc/32
+    
+    if (eeprom_read(first_ever_run_location) != 69) {
+        heat_setpoint = 15;
+        cool_setpoint = 40;
+        eeprom_write(first_ever_run_location, 69);
+        save_all_pid_settings(); 
+    } else {
+        heat_setpoint = eeprom_read(heat_setpoint_location);
+        cool_setpoint = eeprom_read(cool_setpoint_location);
+        load_pid_settings();
+    }
+    T0CON = 0xC7; // 16-bit, Internal Clock, 1:256 Prescaler
+}
 
    key                                       =13 ;  // holds keypad value
    one_second_counter =0                        ;   // timer interrupt counter
