@@ -6,9 +6,6 @@
 
 // Add these missing variables
 char line1[21], line2[21], line3[21], line4[21];
-uint8_t hour = 12; // Placeholder for RTC logic
-uint8_t mode = 0;
-#define SENSOR_PWR LATAbits.LATA3
 
 // Define your server details
 #define SERVER_IP "192.168.1.100"
@@ -172,11 +169,11 @@ greenhouse_record_t record_buffer[MAX_RECORDS];
 
 void save_to_buffer(uint16_t h, uint16_t l, uint16_t hrs, uint16_t ont, uint16_t offt) {
     if (records_pending < MAX_RECORDS) {
-        record_buffer[buf_head].h_adc = h;
-        record_buffer[buf_head].l_adc = l;
-        record_buffer[buf_head].hrs = hrs;
-        record_buffer[buf_head].on_t = ont;
-        record_buffer[buf_head].off_t = offt;
+        record_buffer[buf_head].inside_temp = inside_temp;
+        record_buffer[buf_head].outside_temp = outside_temp;
+        record_buffer[buf_head].box_temp = box_temp;
+        record_buffer[buf_head].light_level = light_level;
+        record_buffer[buf_head].ssr_states = ssr_states;
         buf_head = (buf_head + 1) % MAX_RECORDS;
         records_pending++;
     } else {
@@ -303,8 +300,8 @@ int16_t calculate_pid_int(pid_params_int_t *p, int16_t setpoint, int16_t current
 
 void load_pid_settings(void) {
     if (eeprom_read(EE_HEAT_KP) == 0xFF) {
-        heat_pid.Kp = 1.0; heat_pid.Ki = 0.1; heat_pid.Kd = 0.05;
-        cool_pid.Kp = 1.0; cool_pid.Ki = 0.1; cool_pid.Kd = 0.05;
+        heat_pid.Kp = 100; heat_pid.Ki = 10; heat_pid.Kd = 5;
+        cool_pid.Kp = 100; cool_pid.Ki = 10; cool_pid.Kd = 5;
         save_all_pid_settings();
     } else {
         heat_pid.Kp = eeprom_read_float(EE_HEAT_KP);
@@ -580,16 +577,24 @@ uint8_t check_inputs(void) {
 }
 
 void main(void) {
-    ADCON1 = 0x0B;                            // AN0 through AN3 are Analog 
-    INTCONbits.RBIE = 1;                      // Enable Port B change interrupt
-    TRISB4 = 1;                               // Column 1 Input
-    TRISB5 = 1;                               // Column 2 Input
-    TRISB6 = 1;                               // Column 3 Input
-    INTCON = 0x00; PIE1 = 0x00; RCSTA = 0x00;
-    ADCON1 = 0x0D; ADCON2 = 0x92; TRISA = 0x07; TRISA3 = 0; TRIS_SSR = 0; 
-    Display_Pin = 0; TRIS_Display = 0; CVRCON = 0x00; CMCON = 0x07;  
-    TRISC6 = 0; TRISC7 = 1; 
-    T0CON = 0xC0;       
+    INTCON = 0x00;           // Disable all interrupts during setup
+    PIE1 = 0x00;             // Disable peripheral interrupts
+    ADCON1 = 0x0B;           
+    ADCON2 = 0x92;           // Right justified, 4 TAD, Fosc/32
+    TRISA = 0x0F;            
+    CMCON = 0x07;            // Comparators OFF
+    CVRCON = 0x00;           // Voltage Reference OFF
+    TRISB = 0x70;            // 0111 0000 (RB4,5,6 as inputs)
+    INTCONbits.RBIE = 1;     // Enable Port B change interrupt
+    TRISlight = 0;           // RC0 Output
+    TRISfan   = 0;           // RC1 Output
+    TRIScool  = 0;           // RC2 Output
+    TRISheat  = 0;           // RC3 Output
+    TRIS_Display = 0;        // RC4 Output  
+    TRISC6 = 0;              // TX Output
+    TRISC7 = 1;              // RX Input
+    Display_Pin = 0;         // Start display pin low
+    T0CON = 0xC0;            // 8-bit, 1:2 prescaler (for 20MHz)    
 
     __delay_ms(100);
     software_putch(12); __delay_ms(100); software_putch(14);
@@ -615,7 +620,6 @@ void main(void) {
         if (keypad_active && debounce_timer == 0) {
             key = check_inputs();
             if (key != 13) {
-               if (key == 13) continue;
                 if (key == 10) { // '*'
                     if (mode == display_only_mode)    mode = setpoint_mode;
                     else if (mode == setpoint_mode)   mode = manual_output_mode;
@@ -624,7 +628,6 @@ void main(void) {
                     else mode = display_only_mode;
                     
                     software_putch(12); // Clear screen on mode change
-                    continue;
                 }
                 switch(mode) {
                     case setpoint_mode: 
@@ -709,9 +712,5 @@ void main(void) {
 
         run_esp_handler(); 
       
-        if (updateDisplayTimer == 0) {
-        time_to_display();
-        updateDisplayTimer = 5; 
-        }
     }
 }
