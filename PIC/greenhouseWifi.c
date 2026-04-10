@@ -2,25 +2,16 @@
 // Created February 2022 Dan Jubenville in ccsc
 // now porting to MPLAB XC8
 
-
-
-// Add these missing variables
 char line1[21], line2[21], line3[21], line4[21];
 
 // Define your server details
 #define SERVER_IP "192.168.1.100"
 #define SERVER_PORT "8080"
 
-// Mode Enums
 enum { display_only_mode, setpoint_mode, manual_output_mode, control_mode, pid_tuning_mode = 7 };
 
-// Fix the function pointer
 #define run_esp_handler process_esp_state_machine
 
-
-/////////////////////////////////////////////////////////////////////////////////
-//******************    Pre-processor definitions    ****************************
-/////////////////////////////////////////////////////////////////////////////////
 #include <xc.h>
 #include <stdio.h>
 #include <stdlib.h>
