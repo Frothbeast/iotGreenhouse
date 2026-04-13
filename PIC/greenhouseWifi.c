@@ -95,13 +95,16 @@ uint16_t tenMinuteCounter = 0;
 uint8_t tenMinuteFlag = 0;
 uint16_t backlightTime = 0;
 uint8_t backlightState = 1;
-
+volatile uint8_t mode = display_only_mode; 
+uint16_t hoursOn = 0;
 uint8_t keypad_active = 0;    // Flag: 1 means we are currently debouncing
 uint8_t last_key = 13;        // Stores the key found during the first hit
 
 float heat_duty = 0, cool_duty = 0;
 uint8_t suspend_heat_active = 1;
-
+uint8_t current_hour = 0;          // Synchronized from server response
+uint8_t current_minute = 0;        // Synchronized from server response
+uint8_t current_day = 0;           // Synchronized from server response
 uint8_t MODcoldPID = 1;
 
 // Filtered results
@@ -202,6 +205,29 @@ uint16_t read_adc(uint8_t channel);
 int16_t calculate_pid_int(pid_params_int_t *p, int16_t setpoint, int16_t current_val);
 void update_all_filters(void);
 void time_to_display(void);
+void queue_status_update(void);
+
+void queue_status_update(void) {
+    if (records_pending < MAX_RECORDS) {
+        uint8_t ssr_mask = 0;
+        if (heat_SSR)  ssr_mask |= 0x01;
+        if (cool_SSR)  ssr_mask |= 0x02;
+        if (fanSSR)    ssr_mask |= 0x04;
+        if (light_SSR) ssr_mask |= 0x08;
+
+        record_buffer[buf_head].inside_temp = inside_temp_filtered;
+        record_buffer[buf_head].outside_temp = outside_temp_filtered;
+        record_buffer[buf_head].box_temp = box_temp_filtered;
+        record_buffer[buf_head].light_level = sunlight_filtered;
+        record_buffer[buf_head].ssr_states = ssr_mask;
+        record_buffer[buf_head].hoursOn = hoursOn; 
+        buf_head = (buf_head + 1) % MAX_RECORDS;
+        records_pending++;
+    } else {
+        strcpy((char*)error_msg, "FULL");
+    }
+}
+
 
 void time_to_display(void) {
     switch(mode) {
